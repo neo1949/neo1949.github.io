@@ -186,7 +186,7 @@ th {
 body {
   position: relative;
   font-family: Ununtu Mono;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 2;
   color: #555;
   background: #fff;
@@ -1237,7 +1237,7 @@ pre .javascript .function {
 .post-body .figure .caption {
   margin: -20px auto 15px;
   text-align: center;
-  font-size: 16px;
+  font-size: 15px;
   color: #999;
   font-weight: bold;
   line-height: 1;
@@ -1822,7 +1822,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #57c2c1;
+  background: #ff69e5;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -2821,7 +2821,7 @@ hr {
 }
 .post-button a {
   padding: 0;
-  font-size: 16px;
+  font-size: 15px;
   background: none;
   border: none;
   border-bottom: 2px solid #666;
