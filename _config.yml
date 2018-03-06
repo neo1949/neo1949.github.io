@@ -10,14 +10,6 @@ author: neo1949
 language: zh-Hans
 timezone: Asia/Shanghai
 
-# Social
-social:
-  GitHub: https://github.com/neo1949
-
-# Social icons
-social_icons:
-  Github: Github
-
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: http://neo1949.cn

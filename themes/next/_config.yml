@@ -47,7 +47,7 @@ rss:
 footer:
   # Specify the date when the site was setup.
   # If not defined, current year will be used.
-  #since: 2015
+  since: 2018
 
   # Icon between year and copyright info.
   icon: user
@@ -101,10 +101,11 @@ menu:
   archives: /archives/ || archive
   #schedule: /schedule/ || calendar
   #sitemap: /sitemap.xml || sitemap
-  #commonweal: /404/ || heartbeat
 
   # Help soliders go home: http://www.szlongyue.org/
   soilders_never_die: http://www.szlongyue.org/
+
+  commonweal: /404/ || heartbeat
 
 # Enable/Disable menu icons.
 menu_icons:
@@ -144,18 +145,22 @@ scheme: Mist
   #Instagram: https://instagram.com/yourname || instagram
   #Skype: skype:yourname?call|chat || skype
 
+social:
+  Github: https://github.com/neo1949
+
 social_icons:
   enable: true
   icons_only: false
   transition: false
+  Github: github
 
 # Blog rolls
 links_icon: link
-links_title: Links
+links_title: Friends
 links_layout: block
 #links_layout: inline
-#links:
-  #Title: http://example.com/
+links:
+  夏敏的博客: http://jerey.cn/
 
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.gif
