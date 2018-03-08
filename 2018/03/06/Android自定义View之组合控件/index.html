@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Android,Custom View," />
 
 
 
@@ -79,17 +79,18 @@
 
 
 
-<meta name="description" content="Android自定义View之自定义组合控件在实际开发中应用界面经常会使用一些布局相同但内容不同的界面，为了减少不必要的重复代码，首先想到的方案是写一个通用的 xml 布局文件，通过 include 标签复用布局，毫无疑问这种方式是可行的。但是由于显示内容的不同，需要在每个使用到的界面先获取到相关控件后再设置属性，很多时候我们只是想显示不同的文字，不需要获取相关控件再设置属性，采用复用布局的方式代">
+<meta name="description" content="在实际开发中应用界面经常会使用一些布局相同但内容不同的界面，为了减少不必要的重复代码，首先想到的方案是写一个通用的 xml 布局文件，通过 include 标签复用布局，毫无疑问这种方式是可行的。但是由于显示内容的不同，需要在每个使用到的界面先获取到相关控件后再设置属性，很多时候我们只是想显示不同的文字，不需要获取相关控件再设置属性，采用复用布局的方式代码仍然显得有些冗余。而自定义组合控件可以轻松">
+<meta name="keywords" content="Android,Custom View">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Android自定义View之组合控件.md">
+<meta property="og:title" content="Android自定义View之组合控件">
 <meta property="og:url" content="http://neo1949.cn/2018/03/06/Android自定义View之组合控件/index.html">
 <meta property="og:site_name" content="neo1949">
-<meta property="og:description" content="Android自定义View之自定义组合控件在实际开发中应用界面经常会使用一些布局相同但内容不同的界面，为了减少不必要的重复代码，首先想到的方案是写一个通用的 xml 布局文件，通过 include 标签复用布局，毫无疑问这种方式是可行的。但是由于显示内容的不同，需要在每个使用到的界面先获取到相关控件后再设置属性，很多时候我们只是想显示不同的文字，不需要获取相关控件再设置属性，采用复用布局的方式代">
+<meta property="og:description" content="在实际开发中应用界面经常会使用一些布局相同但内容不同的界面，为了减少不必要的重复代码，首先想到的方案是写一个通用的 xml 布局文件，通过 include 标签复用布局，毫无疑问这种方式是可行的。但是由于显示内容的不同，需要在每个使用到的界面先获取到相关控件后再设置属性，很多时候我们只是想显示不同的文字，不需要获取相关控件再设置属性，采用复用布局的方式代码仍然显得有些冗余。而自定义组合控件可以轻松">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-06T08:41:20.891Z">
+<meta property="og:updated_time" content="2018-03-08T02:49:56.773Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Android自定义View之组合控件.md">
-<meta name="twitter:description" content="Android自定义View之自定义组合控件在实际开发中应用界面经常会使用一些布局相同但内容不同的界面，为了减少不必要的重复代码，首先想到的方案是写一个通用的 xml 布局文件，通过 include 标签复用布局，毫无疑问这种方式是可行的。但是由于显示内容的不同，需要在每个使用到的界面先获取到相关控件后再设置属性，很多时候我们只是想显示不同的文字，不需要获取相关控件再设置属性，采用复用布局的方式代">
+<meta name="twitter:title" content="Android自定义View之组合控件">
+<meta name="twitter:description" content="在实际开发中应用界面经常会使用一些布局相同但内容不同的界面，为了减少不必要的重复代码，首先想到的方案是写一个通用的 xml 布局文件，通过 include 标签复用布局，毫无疑问这种方式是可行的。但是由于显示内容的不同，需要在每个使用到的界面先获取到相关控件后再设置属性，很多时候我们只是想显示不同的文字，不需要获取相关控件再设置属性，采用复用布局的方式代码仍然显得有些冗余。而自定义组合控件可以轻松">
 
 
 
@@ -125,7 +126,7 @@
 
 
 
-  <title>Android自定义View之组合控件.md | neo1949</title>
+  <title>Android自定义View之组合控件 | neo1949</title>
   
 
 
@@ -183,9 +184,23 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
             
-            首页
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+            标签
           </a>
         </li>
       
@@ -193,17 +208,21 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
             归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+            关于
           </a>
         </li>
       
         
         <li class="menu-item menu-item-soilders_never_die">
           <a href="http://www.szlongyue.org/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
             
             老兵回家
           </a>
@@ -212,8 +231,6 @@
         
         <li class="menu-item menu-item-commonweal">
           <a href="/404/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
             
             公益404
           </a>
@@ -269,7 +286,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Android自定义View之组合控件.md</h1>
+          <h1 class="post-title" itemprop="name headline">Android自定义View之组合控件</h1>
         
 
         <div class="post-meta">
@@ -319,7 +336,8 @@
       
 
       
-        <h1 id="Android自定义View之自定义组合控件"><a href="#Android自定义View之自定义组合控件" class="headerlink" title="Android自定义View之自定义组合控件"></a>Android自定义View之自定义组合控件</h1><p>在实际开发中应用界面经常会使用一些布局相同但内容不同的界面，为了减少不必要的重复代码，首先想到的方案是写一个通用的 xml 布局文件，通过 <code>include</code> 标签复用布局，毫无疑问这种方式是可行的。但是由于显示内容的不同，需要在每个使用到的界面先获取到相关控件后再设置属性，很多时候我们只是想显示不同的文字，不需要获取相关控件再设置属性，采用复用布局的方式代码仍然显得有些冗余。而自定义组合控件可以轻松的实现布局复用，也可以减少代码的冗余量。</p>
+        <p>在实际开发中应用界面经常会使用一些布局相同但内容不同的界面，为了减少不必要的重复代码，首先想到的方案是写一个通用的 xml 布局文件，通过 <code>include</code> 标签复用布局，毫无疑问这种方式是可行的。但是由于显示内容的不同，需要在每个使用到的界面先获取到相关控件后再设置属性，很多时候我们只是想显示不同的文字，不需要获取相关控件再设置属性，采用复用布局的方式代码仍然显得有些冗余。而自定义组合控件可以轻松的实现布局复用，也可以减少代码的冗余量。</p>
+<a id="more"></a>
 <h2 id="自定义组合控件的两种实现方式"><a href="#自定义组合控件的两种实现方式" class="headerlink" title="自定义组合控件的两种实现方式"></a>自定义组合控件的两种实现方式</h2><p>网上介绍自定义组合控件的文章很多，绝大部分文章都是介绍其中的一种实现方式，少部分文章虽然介绍了两种实现方式，但都没有说明两种实现方式的使用差异，我会尝试在这篇文章里介绍两种实现方式的差别，欢迎大家讨论并指出其中的错误。</p>
 <p>为了便于区分将第一种方式实现的组合控件命名为 <code>ItemView</code>，第二种方式实现的组合控件命名为 <code>ItemView2</code>，请阅读文章的时候注意分辨。</p>
 <h3 id="第一种方式"><a href="#第一种方式" class="headerlink" title="第一种方式"></a>第一种方式</h3><p>在构造函数中通过 <code>LayoutInflater.from(context).inflate(R.layout.xxx, this)</code> 将布局与当前 View 进行绑定。</p>
@@ -374,6 +392,14 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Custom-View/" rel="tag"># Custom View</a>
+          
+        </div>
       
 
       
@@ -462,6 +488,15 @@
             
 
             
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
 
           </nav>
 
@@ -514,7 +549,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Android自定义View之自定义组合控件"><span class="nav-number">1.</span> <span class="nav-text">Android自定义View之自定义组合控件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义组合控件的两种实现方式"><span class="nav-number">1.1.</span> <span class="nav-text">自定义组合控件的两种实现方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一种方式"><span class="nav-number">1.1.1.</span> <span class="nav-text">第一种方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二种方式"><span class="nav-number">1.1.2.</span> <span class="nav-text">第二种方式</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义组合控件的两种实现方式"><span class="nav-number">1.</span> <span class="nav-text">自定义组合控件的两种实现方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一种方式"><span class="nav-number">1.1.</span> <span class="nav-text">第一种方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二种方式"><span class="nav-number">1.2.</span> <span class="nav-text">第二种方式</span></a></li></ol></li></ol></div>
             
 
           </div>
