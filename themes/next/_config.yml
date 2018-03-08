@@ -146,13 +146,15 @@ scheme: Mist
   #Skype: skype:yourname?call|chat || skype
 
 social:
-  Github: https://github.com/neo1949
+  Github: https://github.com/neo1949 || github
+  #E-Mail: neo1949@qq.com || envelope
 
 social_icons:
   enable: true
   icons_only: false
   transition: false
   Github: github
+  #E-Mail: envelope
 
 # Blog rolls
 links_icon: link
