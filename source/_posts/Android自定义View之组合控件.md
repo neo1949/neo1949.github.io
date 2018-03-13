@@ -669,6 +669,18 @@ public class ItemView extends LinearLayout {
 </LinearLayout>
 ```
 
+<code>*attrs.xml*</code>
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ItemView">
+        <attr name="itemIcon" format="reference" />
+        <attr name="itemTitle" format="string" />
+        <attr name="itemSummary" format="string" />
+    </declare-styleable>
+</resources>
+```
+
 <code>*MainActivity.java*</code>
 ```java
 package cn.neo.test;
@@ -727,7 +739,8 @@ public class MainActivity extends AppCompatActivity {
 </LinearLayout>
 ```
 
-运行结果：
+从上面的完整示例可以看到，使用第一种方式创建组合控件自定义 View 时，无论使用哪种方法引用控件都可以很方便的设置相关属性，下面是完整示例的运行结果：
+
 {% img http://p5ia12npj.bkt.clouddn.com/2018-03-05/sample_result.jpg 320 %}
 
 ## 参考文章
