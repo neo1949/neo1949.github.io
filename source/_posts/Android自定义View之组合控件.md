@@ -13,7 +13,7 @@ tags:
 
 ## 自定义组合控件的两种实现方式
 
-网上介绍自定义组合控件的文章很多，绝大部分文章都是介绍其中的一种实现方式，少部分文章虽然介绍了两种实现方式，但基本都没有对比两种实现方式的使用差异，我会尝试在这篇文章里介绍两种实现方式的差别，欢迎大家讨论并指出其中的错误。
+网上介绍自定义组合控件的文章很多，绝大部分文章都是介绍其中的一种实现方式，也有少部分文章虽然介绍了两种实现方式，但大都没有说两种实现方式有什么区别。下面我会介绍使用组合控件创建自定义 View 的两种实现方式，并通过运行示例来研究两种实现方式的区别，欢迎阅读并指出其中的错误。
 
 为了便于区分将采用第一种方式实现的组合控件命名为 <code>ItemView</code>，采用第二种方式实现的组合控件命名为 <code>ItemView2</code>，请阅读文章时注意区分。
 
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 </LinearLayout>
 ```
 
-运行效果：
+运行结果：
 {% img http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_01_case_01.jpg 320 %}
 
 运行日志：
@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
 </LinearLayout>
 ```
 
-查看运行结果：
+运行结果：
 {% img http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_01_case_02.jpg 320 %}
 
 运行日志：
@@ -238,6 +238,8 @@ public class MainActivity extends AppCompatActivity {
 03-08 14:53:03.422 3734-3734/cn.neo.test I/ItemView: [ItemView] one param
 03-08 14:53:03.456 3734-3734/cn.neo.test I/ItemView: [onAttachedToWindow] ItemView
 ```
+
+从运行结果来看，以上两种方式都能正常显示出自定义的 View。对比两种不同使用方法的日志在布局中直接引用控件时，系统会在添加完子 View 后调用 <code>onFinishInflate </code> 方法，
 
 ## 第二种方式
 
@@ -354,7 +356,7 @@ public class ItemView2 extends LinearLayout {
 </cn.neo.test.ItemView2>
 ```
 
-在创建好 <code>ItemView2</code> 后，同样的先来看看通过不同方式使用 <code>ItemView2</code> 的区别。
+在创建好 <code>ItemView2</code> 后，同样先来看看通过不同方式使用 <code>ItemView2</code> 的区别。
 
 ### 在布局中引用控件
 
@@ -459,7 +461,7 @@ public class MainActivity extends AppCompatActivity {
 03-08 15:14:01.171 3145-3145/cn.neo.test I/ItemView2: [onAttachedToWindow] ItemView2
 ```
 
-运行代码可以看到界面上也没有显示任何控件，这里就不再贴运行结果截图了，请自行尝试查看效果。
+运行代码可以看到界面上也没有显示任何控件，这里就不展示运行结果了，请自行尝试查看效果。
 
 #### 使用 inflate 的方式新建控件对象
 
@@ -500,11 +502,17 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 从日志信息可以看到两个注意点：
-- 通过 inflate 方法操作创建的对象调用的是两个参数的构造函数。  
-- 使用 findViewById() 获取对象的操作需要放在 super.onFinishInflate() 调用完成之后，否则获取到的对象会为空，设置属性时会报 NullPointerException 异常。
+- 通过 <code>inflate</code> 创建对象时调用的是两个参数的构造函数。  
+- xml 布局中所有子 View 都被添加成功后，系统会调用 <code>onFinishInflate()</code> 方法通知绘制完毕。
+
+第一点解释了为什么使用组合控件创建自定义 View 时必须需要重写两个参数的构造函数。第二点可以看到如果想要在自定义 View 中做一些初始化设置，使用 <code>findViewById()</code> 获取对象的操作必须放在 <code>super.onFinishInflate()</code> 调用之后，否则获取对象设置属性时会报 <code>**NullPointerException**</code> 异常，有兴趣可自行尝试在 <code>super.onFinishInflate()</code> 之前获取对象设置属性，查看运行结果是否如上所述。
 
 ## 分析
 
-使用第一种方式创建自定义组合控件时，可以在布局中直接引用控件，也可以在代码中通过 <code>new</code> 的方式新建控件的对象。如果使用第二种方式创建自定义组合控件，则既无法在布局中直接引用控件，也不能通过 <code>new</code> 的方式新建对象，只能使用 <code>inflate</code> 新建控件的对象，然后才可以使用控件，否则控件在界面上不会显示出来。
+使用第一种方式创建自定义组合控件时，可以在布局中直接引用控件，也可以在代码中通过 <code>new</code> 的方式新建控件的对象。如果使用第二种方式创建自定义组合控件，那么既无法在布局中直接引用控件，也不能通过 <code>new</code> 的方式新建对象，只能使用 <code>inflate</code> 新建控件的对象，然后才可以使用控件，否则控件在界面上不会显示出来。
+
+从两种不同创建方式的使用区别来看，使用组合控件创建自定义 View 的关键在于如何将布局填充到 ViewGroup 中。第一种方式在创建 View 时直接在构造函数中将布局填充到当前 ViewGroup 中，所以可以直接在布局中引用控件，也可以直接 <code>new</code> 控件的对象。而第二种方式在创建自 View 时没有与布局直接关联，所以只能通过 <code>inflate</code> 将布局与自定义 View 绑定后再使用。
 
 以上就是两种不同方式创建自定义组合控件的使用差别，从上面的示例可以看出第一种方式比第二种方式使用起来更加便捷。另外当需要给组合控件添加一些通用属性时，使用第一种方式创建的组合控件使用起来更加便捷。因此我个人推荐使用组合控件创建自定义 View 时使用第一种方法，第二种方法作为了解即可。
+
+## 小结
