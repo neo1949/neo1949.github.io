@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 运行效果：
-<img src="http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_01_case_01.jpg" width="320"/>
+{% img http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_01_case_01.jpg 320 %}
 
 运行日志：
 ```
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 查看运行结果：
-<img src="http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_01_case_02.jpg" width="320"/>
+{% img http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_01_case_02.jpg 320 %}
 
 运行日志：
 ```
@@ -395,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 运行结果：
-<img src="http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_02_case_01.jpg" width="320"/>
+{% img http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_02_case_01.jpg 320 %}
 
 运行日志：
 ```
@@ -488,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 运行结果：
-<img src="http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_02_case_03.jpg" width="320"/>
+{% img http://p5ia12npj.bkt.clouddn.com/2018-03-06/method_02_case_03.jpg 320 %}
 
 运行日志：
 ```
