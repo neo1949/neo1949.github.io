@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
 03-08 14:53:03.456 3734-3734/cn.neo.test I/ItemView: [onAttachedToWindow] ItemView
 ```
 
-从运行结果来看，以上两种方式都能正常显示出自定义的 View。对比两种不同使用方法的日志在布局中直接引用控件时，系统会在添加完子 View 后调用 <code>onFinishInflate </code> 方法，
+从运行结果来看，以上两种方式都能正常显示出自定义 View。从运行日志中可以看到在布局中直接引用控件时，系统在添加完子 View 后会调用 <code>onFinishInflate </code> 方法；而通过 <code>new</code> 方式创建对象时系统不会执行 <code>onFinishInflate</code> 方法。因此在使用这种方式创建自定义组合控件时，不要在 <code>onFinishInflate</code> 方法中执行代码，因为使用 <code>new</code> 方式创建对象时系统根本不会执行该方法。
 
 ## 第二种方式
 
@@ -515,4 +515,220 @@ public class MainActivity extends AppCompatActivity {
 
 以上就是两种不同方式创建自定义组合控件的使用差别，从上面的示例可以看出第一种方式比第二种方式使用起来更加便捷。另外当需要给组合控件添加一些通用属性时，使用第一种方式创建的组合控件使用起来更加便捷。因此我个人推荐使用组合控件创建自定义 View 时使用第一种方法，第二种方法作为了解即可。
 
-## 小结
+## 完整示例
+<code>*ItemView.java*</code>
+```java
+package cn.neo.test;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+public class ItemView extends LinearLayout {
+    private static final String TAG = ItemView.class.getSimpleName();
+
+    private Drawable mItemIcon;
+    private CharSequence mItemTitle;
+    private CharSequence mItemSummary;
+
+    private ImageView mIconIv;
+    private TextView mTitleTv;
+    private TextView mSummaryTv;
+
+    public ItemView(Context context) {
+        this(context, null);
+    }
+
+    public ItemView(Context context, @Nullable AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public ItemView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initView(context, attrs);
+    }
+
+    private void initView(Context context, AttributeSet attrs) {
+        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.ItemView);
+        mItemIcon = array.getDrawable(R.styleable.ItemView_itemIcon);
+        mItemTitle = array.getString(R.styleable.ItemView_itemTitle);
+        mItemSummary = array.getString(R.styleable.ItemView_itemSummary);
+        array.recycle();
+
+        LayoutInflater.from(context).inflate(R.layout.item_view, this);
+        mIconIv = findViewById(R.id.iv_icon);
+        mTitleTv = findViewById(R.id.tv_title);
+        mSummaryTv = findViewById(R.id.tv_summary);
+
+        mIconIv.setImageDrawable(mItemIcon);
+        mTitleTv.setText(mItemTitle);
+        mSummaryTv.setText(mItemSummary);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        // register listener ...
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        // unregister listener ...
+    }
+
+    public void setIcon(Drawable icon) {
+        mIconIv.setImageDrawable(icon);
+    }
+
+    public Drawable getIcon() {
+        return mItemIcon;
+    }
+
+    public void setTitle(@StringRes int resId) {
+        setTitle(getResources().getString(resId));
+    }
+
+    public void setTitle(CharSequence title) {
+        mItemTitle = title;
+        mTitleTv.setText(title);
+    }
+
+    public CharSequence getTitle() {
+        return mItemTitle;
+    }
+
+    public void setSummary(@StringRes int resId) {
+        setSummary(getResources().getString(resId));
+    }
+
+    public void setSummary(CharSequence summary) {
+        mItemSummary = summary;
+        mSummaryTv.setText(summary);
+    }
+
+    public CharSequence getSummary() {
+        return mItemSummary;
+    }
+}
+```
+
+<code>*item_view.xml*</code>
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_item_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/iv_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_launcher" />
+
+    <LinearLayout
+        android:id="@+id/ll_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@string/title1"
+            android:textColor="@color/colorPrimaryText"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/summary1"
+            android:textColor="@color/colorSecondaryText"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+</LinearLayout>
+```
+
+<code>*MainActivity.java*</code>
+```java
+package cn.neo.test;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.FrameLayout;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        FrameLayout container = findViewById(R.id.container);
+        ItemView itemView = new ItemView(this);
+        itemView.setIcon(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        itemView.setTitle(R.string.test_title2);
+        itemView.setSummary(R.string.test_summary2);
+        container.addView(itemView);
+    }
+}
+```
+
+<code>*activity_main.xml*</code>
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="cn.neo.test.MainActivity">
+
+    <cn.neo.test.ItemView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:itemIcon="@mipmap/ic_launcher_round"
+        app:itemSummary="@string/test_summary1"
+        app:itemTitle="@string/test_title1" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3px"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary" />
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
+```
+
+运行结果：
+{% img http://p5ia12npj.bkt.clouddn.com/2018-03-05/sample_result.jpg 320 %}
+
+## 参考文章
+[onFinishInflate() never gets called - stackoverflow](https://stackoverflow.com/questions/9650906/onfinishinflate-never-gets-called)
