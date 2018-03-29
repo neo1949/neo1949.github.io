@@ -56,7 +56,7 @@ OuterClass.InnerClass innerClass = outerClass.new InnerClass();
 #### Anonymous Classes - 匿名类
 匿名类可以让代码更简洁，匿名类允许在同一时间声明和实例化一个类。除了没有一个名字之外，匿名类就像本地类，如果你只需要使用本地类一次，那么推荐你使用匿名类。
 
-本地类是类声明，而匿名类是一个表达式，这意味着你在表达式里面定义了一个类。下面的 HelloWorldAnonymousClasses 示例在初始化本地变量frenchGreeting spanishGreeting 使用了匿名类，而在初始化变量 englishGreeting 使用了本地类：
+本地类是类声明，而匿名类是一个表达式，这意味着你在表达式里面定义了一个类。下面的 HelloWorldAnonymousClasses 示例在初始化本地变量frenchGreeting 和 spanishGreeting 使用了匿名类，而在初始化变量 englishGreeting 使用了本地类：
 
 ```java
 public class HelloWorldAnonymousClasses {
@@ -117,10 +117,16 @@ public class HelloWorldAnonymousClasses {
 
 如前所述，一个匿名类是一个表达式。一个匿名类表达式的语法就像一个构造函数的调用，除了在代码中有一块类定义的区域。因为一个匿名类定义是一个表达式,所以它必须是声明的一部分。在这个例子中,匿名类表达式声明实例化frenchGreeting对象的一部分。(这就解释了为什么有分号后关闭括号)
 
-匿名类表达式包含以下:
--
+匿名类表达式由如下组成：
+- 一个用来实现接口或者扩展类的名字，在这个例子中匿名类实现了接口HelloWorld
+- 一个包含类定义的 body
 
-。
+#### 访问封闭范围的局部变量，声明和访问匿名类的成员
+匿名类可以像本地类一样捕获变量，它们对封闭范围的局部变量有同样的访问权限：
+- 匿名类可以访问封闭类（即外部类）的成员
+- 匿名类不能访问封闭范围内未声明为 <code>final</code> 或 <code>effectively final</code> 的局部变量
+
+
 
 ## 参考文章
 [Nested Classes - Oracle](https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html)
