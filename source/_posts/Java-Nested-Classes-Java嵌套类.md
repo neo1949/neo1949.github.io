@@ -7,7 +7,7 @@ tags:
 categories:
 ---
 
-本文节选了官方文档 [Nested Classes](https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html) 的部分内容进行翻译，通过翻译过程系统地学习 Java 嵌套类。
+本文节选了 [Nested Classes](https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html) 官方文档的部分内容进行翻译，通过翻译过程系统地学习 Java 嵌套类。
 
 <!-- more -->
 
@@ -44,7 +44,7 @@ static OuterClass {
 - 可以使代码具有更好的可读性和可维护性
 
 ### Static Nested Classes - 静态嵌套类
-与类的方法和变量一样，静态嵌套类与外部类相关联。与静态方法一样，静态嵌套类不能只能直接引用封闭类中定义的实例变量或方法，只能通过一个对象引用来使用它们。一个静态嵌套类与它的外部类的实例成员(和其他类)就像任何其他顶级类，它的行为跟一个顶级类一样，只是为了包装方便而嵌套在另一个顶级类中。通俗的理解就是：静态嵌套类只是为了方便而将一个类隐藏在另一个类中，和外部类之间不存在本质上的“内外”关系。
+与类方法和变量一样，静态嵌套类与外部类相关联。与静态方法一样，静态嵌套类不能直接引用封闭类中定义的实例变量或方法，只能通过一个对象引用来使用它们。静态嵌套类与它外部类实例成员或方法(和其它类)之间的交互就像任何其它顶级类一样。实际上，为了方便打包，静态嵌套类在行为上是嵌套在另一个顶级类中的顶级类。通俗的理解就是：静态嵌套类只是为了打包方便而将一个类隐藏在另一个类中，和外部类之间不存在本质上的“内外”关系。
 
 静态嵌套类的调用方式如下：
 ```java
@@ -56,9 +56,9 @@ OuterClass.StaticNestedClass nestedObject = new OuterClass.StaticNestedClass();
 ```
 
 ### Inner Classes - 内部类
-与实例方法和变量一样，一个内部类与包含它的外部类实例相关联，可以直接访问外部类实例的方法和字段。此外因为内部类与实例相关联，所以内部类本身不能定义任何静态成员。
+与实例方法和变量一样，一个内部类与包含它的外部类实例相关联，可以直接访问外部类实例的方法和字段。此外，因为内部类与实例相关联，所以内部类本身不能定义任何静态成员。
 
-一个内部类的实例只能存在于一个外部类的实例中，并且可以直接访问外部类实例的方法和字段。想要实例化一个内部类，必须先实例化外部类，然后再通过下面的方式创建内部类的实例：
+一个内部类的实例只能存在于一个外部类的实例中，并且可以直接访问外部类实例的方法和字段。想要实例化一个内部类，必须先实例化外部类，然后再通过外部类对象创建内部类的实例，语法如下：
 ```java
 OuterClass outerClass = new OuterClass();
 OuterClass.InnerClass innerClass = outerClass.new InnerClass();
@@ -67,7 +67,7 @@ OuterClass.InnerClass innerClass = outerClass.new InnerClass();
 有两种特殊的内部类：[局部类 local classes](https://docs.oracle.com/javase/tutorial/java/javaOO/localclasses.html) 和 [匿名类 anonymous classes](https://docs.oracle.com/javase/tutorial/java/javaOO/localclasses.html)。
 
 ### 遮盖
-如果特定作用域（如内部类或方法定义）中的类型声明（例如成员变量或参数名称）与封闭作用域中的另一个声明具有相同的名称，则该声明会隐藏封闭的范围中的声明。你无法单独通过名称来引用被隐藏的声明。下面的示例 ShadowTest 演示了这一点：
+如果特定作用域（如内部类或方法定义）中的类型声明（例如成员变量或参数名称）与封闭作用域中的另一个声明具有相同的名称，则该声明会隐藏封闭范围中的声明。你无法单独通过名称来引用被隐藏的声明。下面的示例 ShadowTest 演示了这一点：
 ```java
 public class ShadowTest {
 
@@ -104,7 +104,7 @@ ShadowTest.this.x = 0
 System.out.println("this.x = " + this.x);
 ```
 
-通过它们所属的类名引用包含较大范围的成员变量。例如下面的语句在 methodInFirstLevel 方法中访问类 ShadowTest 的成员变量<code>x</code>：
+通过它们所属的类名引用包含较大范围的成员变量。例如下面的语句在 methodInFirstLevel 方法中访问了类 ShadowTest 的成员变量<code>x</code>：
 ```java
 System.out.println("ShadowTest.this.x = " + ShadowTest.this.x);
 ```
@@ -192,7 +192,7 @@ PhoneNumber(String phoneNumber) {
 }
 ```
 
-因为赋值语句，变量 numberLength 不再 <code>effectively final</code>。因此 Java 编译器会在 PhoneNumber 访问变量 numberLength 的地方生成错误信息“local variables referenced from an inner class must be final or effectively final”：
+因为赋值语句，变量 numberLength 不再 <code>effectively final</code>。因此 Java 编译器会在 PhoneNumber 访问变量 numberLength 的地方生成错误信息 "local variables referenced from an inner class must be final or effectively final"：
 ```java
 if (currentNumber.length() == numberLength)
 ```
@@ -206,7 +206,7 @@ public void printOriginalNumbers() {
 ```
 
 ### 局部类与内部类相似
-局部类与内部类相似，因为它们无法定义或声明任何静态成员。静态方法中的局部类只能引用封闭类的静态成员，就像定义在静态方法 validatePhoneNumber 中的 PhoneNumber 类。如果你没有将成员变量  regularExpression 定义为 <code>static</code>，那么 Java 编译器就会生成错误信息“non-static variable regularExpression cannot be referenced from a static context”。
+局部类与内部类相似，因为它们无法定义或声明任何静态成员。静态方法中的局部类只能引用封闭类的静态成员，就像定义在静态方法 validatePhoneNumber 中的 PhoneNumber 类。如果你没有将成员变量  regularExpression 定义为 <code>static</code>，那么 Java 编译器就会生成错误信息 "non-static variable regularExpression cannot be referenced from a static context"。
 
 局部类由于是非静态的，所以它们可以访问封闭区块的实例变量，因此它们不能包含绝大部分的静态声明。
 
