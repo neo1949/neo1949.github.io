@@ -37,6 +37,8 @@ static OuterClass {
 
 嵌套类是封闭类的一个成员。非静态嵌套类可以访问封闭类的其它成员，即使它们被声明为 <code>private</code>。静态嵌套类无法访问封闭类的其它成员。作为外部类的一个成员，嵌套类可以声明为<code>private</code>、 <code>public</code>、<code>protected</code> 或 <code>package private</code>，回想一下外部类只能声明为 <code>public</code> 或者 <code>package private</code>。
 
+什么是 <code>package private</code>？如果一个类没有使用 <code>private</code>、 <code>public</code> 或者 <code>protected</code> 修饰，那么这个类具有 Java 提供的一种默认访问权限，这种权限通常称为包访问权限。在这种权限下，类可以访问在同一个包中的其它类的成员，但是在包之外，这些成员如同指定了 <code>private</code> 一样。
+
 ### 为何使用嵌套类
 有以下几条令人信服的理由使用嵌套类：
 - 它是一种将只在一个地方使用的类进行逻辑分组的方式
