@@ -135,15 +135,81 @@ THREAD_SUSPENDED    = 9,        /* suspended, usually by GC or debugger */
 <code>sCount</code> 和 <code>dsCount</code> 整数与线程挂起有关。暂停计数是此线程未决请求的数量，这是 <code>sCount</code>。来自调试器的未完成请求的数量是 <code>dsCount</code>，分开记录，以便如果调试器分离，则可以适当地重置sCount（因为可能有或可能没有未完成的非调试器暂停请求，如果调试器断开，我们不能只把 <code>sCount</code> 重置为0）。
 
 
+> (If there's demand, I'll talk more about thread suspension in another post, including when suspension can occur, and what suspension means for unattached threads and threads executing native methods.)
+
+如果有需要，我会在另一篇文章中谈谈更多关于线程暂停的问题，包括何时会发生暂停，以及对未连接的线程和正在执行本地方法的线程，暂停意味着什么。
+
+
+> The address of the Thread comes next, labeled obj.
+
+接下来是 <code>Thread</code> 的地址，标记为 <code>obj</code>。
+
+
+> The address of the Thread* comes next, labeled self. Neither of these addresses is likely to be useful to you unless you're attaching gdb(1) to a running dalvikvm process.
+
+接下来是 <code>Thread *</code> 的地址，标记为 <code>self</code>。除非你将 gdb(1) 附加到正在运行的 dalvikvm 进程，否则这些地址对你没有用处。
+
+
 ### 第三行参数说明
 ```
 sysTid=22299 nice=0 sched=0/0 cgrp=[n/a] handle=-256476304
 ```
+
+> The kernel's thread id comes next, labeled sysTid. You can use this if you're poking around in /proc/pid/task/tid. This is usually the only useful item on this line.
+
+接下来是内核的线程 ID，标记为 <code>sysTid</code>。你可以在 */proc/pid/task/tid* 中使用它。这通常是这行对你唯一有用的参数。
+
+
+> The kernel's nice value for the process comes next, labeled nice. This is as returned by the getpriority(2) system call.
+
+接下来是内核的 *nice value*，标记为 <code>nice</code>。这是由 getpriority(2) 系统调用返回的。
+
+
+> The pthread scheduler policy and priority come next, labeled sched. This is as returned by the pthread_getschedparam(3) call.
+
+接下来是 pthread 调度程序策略和优先级，标记为 <code>sched</code>。这是由 pthread_getschedparam(3) 调用返回的。
+
+
+> The cgrp is the name of the thread's scheduler group, pulled from the appropriate cgroup file in /proc.
+
+<code>cgrp</code> 是线程调度程序组的名称，从 */proc* 中相应的 cgroup 文件中提取。
+
+
+> The pthread_t for the pthread corresponding to this thread comes next, labeled handle. This is not much use unless you're in gdb(1).
+
+紧接着是与这个线程对应的 pthread 的 pthread_t，标记为 <code>handle</code>。除非你在gdb(1) 中，否则这个用处不大。
+
 
 ### 第四行参数说明
 ```
 schedstat=( 153358572 709218 48 ) utm=12 stm=4 core=8
 ```
 
+> The schedstat data is pulled from the per-process schedstat files in /proc. The format is documented in the Linux kernel tree (Documentation/scheduler/sched-stats.txt):
+
+<code>schedstat</code> 数据是从 */proc* 中每个进程的 *schedstat* 文件里面提取的。格式记录在Linux内核树（Documentation/scheduler/sched-stats.txt）中。
+
+```
+1) time spent on the cpu
+2) time spent waiting on a runqueue
+3) # of timeslices run on this cpu
+```
+
+> If your kernel does not support this, you'll see "schedstat=( 0 0 0 )".
+
+如果你的内核不支持这个，你会看到 "schedstat = (0 0 0)"。
+
+
+> The user-mode and kernel-mode jiffies come next, labeled utm and stm. These correspond to the utime and stime fields of the per-thread stat files in /proc. On sufficiently new versions of Dalvik, you'll also see something like "HZ=100", so you can double-check that jiffies are the length you expect. These numbers aren't much use in isolation, except for seeing which threads are taking all the CPU time (if any).
+
+接下来是用户模式和内核模式 jiffies，标记为 <code>utm</code> 和 <code>stm</code>。这些对应于 */proc* 中每个线程统计文件的 utime 和 stime 字段。在 Dalvik 的新版本中，你还会看到类似 "HZ = 100" 的内容，因此你可以仔细检查 jiffies 是否是你期望的长度。除了查看哪些线程正在占用所有 CPU 时间（如果有）之外，这些数字并没有太多用处。
+
+
+> The cpu number of the core this thread was last executed on comes next, labeled core.
+
+接下来是最后执行该线程的核心的 CPU 号，标记为 <code>core</code>。
+
 ## 参考文章
 [Understanding Threads and Locks - Oracle](https://docs.oracle.com/cd/E13150_01/jrockit_jvm/jrockit/geninfo/diagnos/thread_basics.html)
+[Difference between core and processor? - stackoverflow
+](https://stackoverflow.com/questions/19225859/difference-between-core-and-processor)
