@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/web_icon-32x32.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/web_icon_16x16.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="原文：How to read Dalvik SIGQUIT output 限于本人英语水平，且对原文中的相关专业术语缺乏了解，因此翻译难免会有错误和歧义，欢迎大家指教。在翻译时对译文做了分段处理，并在译文相关地方添加了一些辅助说明，不需要译文的请直接点击上面的链接（需科学上网）查看原文。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】 How to read Dalvik SIGQUIT output">
+<meta property="og:url" content="http://neo1949.cn/2018/04/09/translations_How-to-read-Dalvik-SIGQUIT-output/index.html">
+<meta property="og:site_name" content="neo1949">
+<meta property="og:description" content="原文：How to read Dalvik SIGQUIT output 限于本人英语水平，且对原文中的相关专业术语缺乏了解，因此翻译难免会有错误和歧义，欢迎大家指教。在翻译时对译文做了分段处理，并在译文相关地方添加了一些辅助说明，不需要译文的请直接点击上面的链接（需科学上网）查看原文。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-04-10T02:13:40.124Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【译】 How to read Dalvik SIGQUIT output">
+<meta name="twitter:description" content="原文：How to read Dalvik SIGQUIT output 限于本人英语水平，且对原文中的相关专业术语缺乏了解，因此翻译难免会有错误和歧义，欢迎大家指教。在翻译时对译文做了分段处理，并在译文相关地方添加了一些辅助说明，不需要译文的请直接点击上面的链接（需科学上网）查看原文。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://neo1949.cn/2018/04/09/translations_How-to-read-Dalvik-SIGQUIT-output/"/>
+
+
+
+
+
+  <title>【译】 How to read Dalvik SIGQUIT output | neo1949</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">neo1949</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Choose red or choose blue ?</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-soilders_never_die">
+          <a href="http://www.szlongyue.org/" rel="section">
+            
+            老兵回家
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/" rel="section">
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://neo1949.cn/2018/04/09/translations_How-to-read-Dalvik-SIGQUIT-output/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="neo1949">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="neo1949">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【译】 How to read Dalvik SIGQUIT output</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-09T21:01:04+08:00">
+                2018-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>原文：<a href="http://elliotth.blogspot.com/2012/08/how-to-read-dalvik-sigquit-output.html" target="_blank" rel="noopener">How to read Dalvik SIGQUIT output</a></p>
+<p>限于本人英语水平，且对原文中的相关专业术语缺乏了解，因此翻译难免会有错误和歧义，欢迎大家指教。在翻译时对译文做了分段处理，并在译文相关地方添加了一些辅助说明，不需要译文的请直接点击上面的链接（需科学上网）查看原文。</p>
+<a id="more"></a>
+<p>翻译文章的目的是通过翻译的过程学习相关知识，而且可以做个备份，日后再需要使用的时候可以很方便的查阅。英文水平差无关紧要，有谷歌翻译可以帮助我们解决大部分问题，再加上自己的一点理解即可。闲话不再多说，下面开始进入正文。</p>
+<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><blockquote>
+<p>If you’re a long-time Java developer you’re probably used to sending SIGQUIT to a Java process (either via kill -3 or hitting ctrl-) to see what all the threads are doing. You can do the same with Dalvik (via adb shell kill -3), and if you’re ANRing the system server will be sending you SIGQUIT too, in which case the output will end up in /data/anr/traces.txt (see the logcat output for details).</p>
+</blockquote>
+<p>如果你是一位长期从事 Java 开发的人员，那么你可能已经习惯于将 SIGQUIT 发送给 Java 进程（通过 <code>kill -3</code> 或者 敲击 <code>Ctrl-\</code>）来查看所有线程正在执行的操作。你可以使用 Dalvik （通过 <code>adb shell kill -3</code>）做同样的事情，系统服务也会向你发送 SIGQUIT，这种情况下输出将会被保存到 <code>/data/anr/traces.txt</code> 中（请参阅 logcat 输出获取详细信息）。</p>
+<blockquote>
+<p>Anyway, I’ve found that very few people actually know what all the output means. I only knew a few of the more important bits until I became a Dalvik maintainer. This post should hopefully clear things up a little.</p>
+</blockquote>
+<p>总之，我发现很少有人真正知道所有的输出是是什么意思。在成为 Dalvik 维护人员之前，我也只是知道一些更重要的部分。希望这篇文章能够澄清一些事情。</p>
+<h2 id="示例及说明"><a href="#示例及说明" class="headerlink" title="示例及说明"></a>示例及说明</h2><blockquote>
+<p>To start with, here’s an example from my JNI Local Reference Changes in ICS post:</p>
+</blockquote>
+<p>首先，这是我在 ICS post 中 JNI Local Reference Changes 的一个例子：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"Thread-10"</span> prio=<span class="number">5</span> tid=<span class="number">8</span> NATIVE</span><br><span class="line">  | group=<span class="string">"main"</span> sCount=<span class="number">0</span> dsCount=<span class="number">0</span> obj=<span class="number">0xf5f77d60</span> self=<span class="number">0x9f8f248</span></span><br><span class="line">  | sysTid=<span class="number">22299</span> nice=<span class="number">0</span> sched=<span class="number">0</span>/<span class="number">0</span> cgrp=[n/a] handle=-<span class="number">256476304</span></span><br><span class="line">  | schedstat=( <span class="number">153358572</span> <span class="number">709218</span> <span class="number">48</span> ) utm=<span class="number">12</span> stm=<span class="number">4</span> core=<span class="number">8</span></span><br><span class="line">  at MyClass.printString(Native Method)</span><br><span class="line">  at MyClass$<span class="number">1</span>.run(MyClass.java:<span class="number">15</span>)</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>Ignore the Java stack trace for now. If there’s demand, I’ll come back to that later, but there’s nothing interesting in this particular example. Let’s go through the other lines…</p>
+</blockquote>
+<p>现在请暂时忽略 Java 堆栈跟踪。 如果有需求，我会在稍后说明，但这个例子中没有什么令人关注的。我们来看看其它行的信息：</p>
+<blockquote>
+<p>First, though, a quick note on terminology because there are a lot of different meanings of “thread” that you’ll have to keep clear. If I say Thread, I mean java.lang.Thread. If I say pthread, I mean the C library’s abstraction of a native thread. If I say native thread, I mean something created by the kernel in response to a clone(2) system call. If I say Thread*, I mean the C struct in the VM that holds all these things together. And if I say thread, I mean the abstract notion of a thread.</p>
+</blockquote>
+<p>首先是关于术语的简要说明，因为你必须明白 <strong>thread</strong> 有许多不同的含义。 如果我说 <code>Thread</code>，我的意思是 <code>java.lang.Thread</code>。如果我说 <code>pthread</code>，我的意思是C库的本地线程的抽象。如果我说本地线程，我的意思是内核创建的响应克隆（2）系统调用的东西。如果我说 <code>Thread *</code>，我的意思是 VM 中将所有这些东西放在一起的 C 结构。如果我说 <code>thread</code>，我的意思是线程的抽象概念。</p>
+<h3 id="第一行参数说明"><a href="#第一行参数说明" class="headerlink" title="第一行参数说明"></a>第一行参数说明</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;Thread-10&quot; prio=5 tid=8 NATIVE</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>The thread name comes first, in quotes. If you gave a name to a Thread constructor, that’s what you’ll see here. Otherwise there’s a static int in Thread that’s a monotonically increasing thread id, used solely for giving each thread a unique name. These thread ids are never reused in a given VM (though theoretically you could cause the int to wrap).</p>
+</blockquote>
+<p>首先是引号中的线程名称。如果你向 <code>Thread</code> 的构造函数传递了一个名称，那么你会在这里看到。否则，<code>Thread</code> 中有一个静态 int，它是一个单调递增的线程 ID，仅用于给每个线程一个唯一的名称。这些线程 ID 不会在给定的虚拟机中重用（尽管理论上你可能会导致 int 溢出）。</p>
+<blockquote>
+<p>The thread priority comes next. This is the Thread notion of priority, corresponding to the getPriority and setPriority calls, and the MIN_PRIORITY, NORM_PRIORITY, and MAX_PRIORITY constants.</p>
+</blockquote>
+<p>接下来是线程优先级。这是 <code>Thread</code> 的优先级概念，对应于 <code>getPriority</code> 和 <code>setPriority</code> 调用，以及 <code>MIN_PRIORITY</code>，<code>NORM_PRIORITY</code> 和 <code>MAX_PRIORITY</code> 常量。</p>
+<p><code>java.lang.Thread</code> 中对于三个常量的定义如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The minimum priority that a thread can have.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MIN_PRIORITY = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The default priority that is assigned to a thread.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> NORM_PRIORITY = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The maximum priority that a thread can have.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_PRIORITY = <span class="number">10</span>;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>The thread’s thin lock id comes next, labelled “tid”. If you’re familiar with Linux, this might confuse you; it’s not the tid in the sense of the gettid(2) system call. This is an integer used by the VM’s locking implementation. These ids come from a much smaller pool, so they’re reused as threads come and go, and will typically be small integers.</p>
+</blockquote>
+<p>接下来是标记为 <code>tid</code> 的线程的 <strong>thin lock</strong> ID。如果你熟悉 Linux，这可能会让你困惑；它不是 gettid 系统调用意义上的 tid。这是 VM 锁定实现所使用的整数。这些 ID 来自一个小得多的池，所以它们在线程来来去去时被重用，并且通常是小整数。</p>
+<p>关于什么是 thin lock id，请参考 <a href="https://docs.oracle.com/cd/E13150_01/jrockit_jvm/jrockit/geninfo/diagnos/thread_basics.html#wp1090499" target="_blank" rel="noopener">Understanding Threads and Locks</a> 中对于 Locks 的说明。</p>
+<blockquote>
+<p>The thread’s state comes last. These states are similar to, but a superset of, the Thread thread states. They can also change from release to release. At the time of writing, Dalvik uses the following states (found in enum ThreadStatus in vm/Thread.h):</p>
+</blockquote>
+<p>最后是线程的状态。这些状态与 <code>Thread</code> 的线程状态类似，但是是超线程状态。它们从一个版本到另一个版本可能发生变化。在撰写本文时，Dalvik使用以下状态（可在 vm/Thread.h 的枚举 ThreadStatus 中找到）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* these match up with JDWP values */</span></span><br><span class="line">THREAD_ZOMBIE       = <span class="number">0</span>,        <span class="comment">/* TERMINATED */</span></span><br><span class="line">THREAD_RUNNING      = <span class="number">1</span>,        <span class="comment">/* RUNNABLE or running now */</span></span><br><span class="line">THREAD_TIMED_WAIT   = <span class="number">2</span>,        <span class="comment">/* TIMED_WAITING in Object.wait() */</span></span><br><span class="line">THREAD_MONITOR      = <span class="number">3</span>,        <span class="comment">/* BLOCKED on a monitor */</span></span><br><span class="line">THREAD_WAIT         = <span class="number">4</span>,        <span class="comment">/* WAITING in Object.wait() */</span></span><br><span class="line"><span class="comment">/* non-JDWP states */</span></span><br><span class="line">THREAD_INITIALIZING = <span class="number">5</span>,        <span class="comment">/* allocated, not yet running */</span></span><br><span class="line">THREAD_STARTING     = <span class="number">6</span>,        <span class="comment">/* started, not yet on thread list */</span></span><br><span class="line">THREAD_NATIVE       = <span class="number">7</span>,        <span class="comment">/* off in a JNI native method */</span></span><br><span class="line">THREAD_VMWAIT       = <span class="number">8</span>,        <span class="comment">/* waiting on a VM resource */</span></span><br><span class="line">THREAD_SUSPENDED    = <span class="number">9</span>,        <span class="comment">/* suspended, usually by GC or debugger */</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>You won’t see ZOMBIE much; a thread is only in that state while it’s being dismantled. RUNNING is something of a misnomer; the usual term is “runnable”, because whether or not the thread is actually scheduled on a core right now is out of the VM’s hands. TIMED_WAIT corresponds to an Object.wait(long, int) call. Note that Thread.sleep and Object.wait(long) are currently both implemented in terms of this. WAIT, by contrast, corresponds to a wait without a timeout, via Object.wait(). MONITOR means that the thread is blocked trying to synchronize on a monitor, Either because of a synchronized block or an invoke of a synchronized method (or theoretically, on a call to JNIEnv::MonitorEnter).</p>
+</blockquote>
+<p>你不会经常看到 <strong>ZOMBIE</strong> 状态，一个线程只有在被拆除时才会处于该状态。<strong>RUNNING</strong> 不是很贴切，通常术语是“running”，因为无论线程是否在一个核心上，现在已经不在 VM 的掌控中了。<strong>TIMED_WAIT</strong> 对应于 <code>Object.wait(long，int)</code> 调用。请注意， <code>Thread.sleep</code> 和 <code>Object.wait(long)</code> 目前都是以这种方式实现的。相反，<strong>WAIT</strong> 对应于通过 <code>Object.wait()</code> 实现的没有超时的等待。<strong>MONITOR</strong> 意味着线程被阻塞，试图在监视器上进行同步，或者是因为同步块或调用同步方法（或理论上在调用 <code>JNIEnv :: MonitorEnter</code> 时）。</p>
+<blockquote>
+<p>The INITIALIZING and STARTING states are aspects of the current (at the time of writing) implementation of the thread startup dance. As an app developer, you can probably just chunk these two as “too early to be running my code”. NATIVE means that the thread is in a native method. VMWAIT means that the thread is blocked trying to acquire some resource that isn’t visible to managed code, such as an internal lock (that is, a pthread_mutex). SUSPENDED means that the thread has been told to stop running and is waiting to be allowed to resume; as the comment says, typically as an app developer you’ll see this because there’s a GC in progress or a debugger is attached.</p>
+</blockquote>
+<p><strong>INITIALIZING</strong> 和 <strong>STARTING</strong> 状态是当前（编写时）线程启动舞蹈的实现方面。 作为一名应用程序开发人员，您可能只是将这两者分成“过早运行我的代码”。<strong>NATIVE</strong> 意味着线程处于本地方法。<strong>VMWAIT</strong> 意味着线程被阻塞，试图获取某些托管代码不可见的资源，例如内部锁（即pthread_mutex）。<strong>SUSPENDED</strong> 意味着线程已被告知停止运行，并且正在等待被允许恢复; 正如评论所说，通常作为应用程序开发人员，你会看到这一点，因为有 GC 正在进行或者附加了调试程序。</p>
+<blockquote>
+<p>Not shown in this example, a daemon thread will also say “daemon” at the end of the first line.</p>
+</blockquote>
+<p>在这个例子中没有展示，一个守护线程通常会第一行的末尾使用 <code>daemon</code> 说明。</p>
+<h3 id="第二行参数说明"><a href="#第二行参数说明" class="headerlink" title="第二行参数说明"></a>第二行参数说明</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">| group=&quot;main&quot; sCount=0 dsCount=0 obj=0xf5f77d60 self=0x9f8f248</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>The Thread’s containing ThreadGroup name comes next, in quotes.</p>
+</blockquote>
+<p>接下来是用引号括起来的包含 ThreadGroup 的线程名称。</p>
+<blockquote>
+<p>The sCount and dsCount integers relate to thread suspension. The suspension count is the number of outstanding requests for suspension for this thread; this is sCount. The number of those outstanding requests that came from the debugger is dsCount, recorded separately so that if a debugger detaches then sCount can be reset appropriately (since there may or may not have been outstanding non-debugger suspension requests, we can’t just reset sCount to 0 if a debugger disconnects).</p>
+</blockquote>
+<p><code>sCount</code> 和 <code>dsCount</code> 整数与线程挂起有关。暂停计数是此线程未决请求的数量，这是 <code>sCount</code>。来自调试器的未完成请求的数量是 <code>dsCount</code>，分开记录，以便如果调试器分离，则可以适当地重置sCount（因为可能有或可能没有未完成的非调试器暂停请求，如果调试器断开，我们不能只把 <code>sCount</code> 重置为0）。</p>
+<blockquote>
+<p>(If there’s demand, I’ll talk more about thread suspension in another post, including when suspension can occur, and what suspension means for unattached threads and threads executing native methods.)</p>
+</blockquote>
+<p>如果有需要，我会在另一篇文章中谈谈更多关于线程暂停的问题，包括何时会发生暂停，以及对未连接的线程和正在执行本地方法的线程，暂停意味着什么。</p>
+<blockquote>
+<p>The address of the Thread comes next, labeled obj.</p>
+</blockquote>
+<p>接下来是 <code>Thread</code> 的地址，标记为 <code>obj</code>。</p>
+<blockquote>
+<p>The address of the Thread* comes next, labeled self. Neither of these addresses is likely to be useful to you unless you’re attaching gdb(1) to a running dalvikvm process.</p>
+</blockquote>
+<p>接下来是 <code>Thread *</code> 的地址，标记为 <code>self</code>。除非你将 gdb(1) 附加到正在运行的 dalvikvm 进程，否则这些地址对你没有用处。</p>
+<h3 id="第三行参数说明"><a href="#第三行参数说明" class="headerlink" title="第三行参数说明"></a>第三行参数说明</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysTid=22299 nice=0 sched=0/0 cgrp=[n/a] handle=-256476304</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>The kernel’s thread id comes next, labeled sysTid. You can use this if you’re poking around in /proc/pid/task/tid. This is usually the only useful item on this line.</p>
+</blockquote>
+<p>接下来是内核的线程 ID，标记为 <code>sysTid</code>。你可以在 <em>/proc/pid/task/tid</em> 中使用它。这通常是这行对你唯一有用的参数。</p>
+<blockquote>
+<p>The kernel’s nice value for the process comes next, labeled nice. This is as returned by the getpriority(2) system call.</p>
+</blockquote>
+<p>接下来是内核的 <em>nice value</em>，标记为 <code>nice</code>。这是由 getpriority(2) 系统调用返回的。</p>
+<blockquote>
+<p>The pthread scheduler policy and priority come next, labeled sched. This is as returned by the pthread_getschedparam(3) call.</p>
+</blockquote>
+<p>接下来是 pthread 调度程序策略和优先级，标记为 <code>sched</code>。这是由 pthread_getschedparam(3) 调用返回的。</p>
+<blockquote>
+<p>The cgrp is the name of the thread’s scheduler group, pulled from the appropriate cgroup file in /proc.</p>
+</blockquote>
+<p><code>cgrp</code> 是线程调度程序组的名称，从 <em>/proc</em> 中相应的 cgroup 文件中提取。</p>
+<blockquote>
+<p>The pthread_t for the pthread corresponding to this thread comes next, labeled handle. This is not much use unless you’re in gdb(1).</p>
+</blockquote>
+<p>紧接着是与这个线程对应的 pthread 的 pthread_t，标记为 <code>handle</code>。除非你在gdb(1) 中，否则这个用处不大。</p>
+<h3 id="第四行参数说明"><a href="#第四行参数说明" class="headerlink" title="第四行参数说明"></a>第四行参数说明</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">schedstat=( 153358572 709218 48 ) utm=12 stm=4 core=8</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>The schedstat data is pulled from the per-process schedstat files in /proc. The format is documented in the Linux kernel tree (Documentation/scheduler/sched-stats.txt):</p>
+</blockquote>
+<p><code>schedstat</code> 数据是从 <em>/proc</em> 中每个进程的 <em>schedstat</em> 文件里面提取的。格式记录在Linux内核树（Documentation/scheduler/sched-stats.txt）中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1) time spent on the cpu</span><br><span class="line">2) time spent waiting on a runqueue</span><br><span class="line">3) # of timeslices run on this cpu</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>If your kernel does not support this, you’ll see “schedstat=( 0 0 0 )”.</p>
+</blockquote>
+<p>如果你的内核不支持这个，你会看到 “schedstat = (0 0 0)”。</p>
+<blockquote>
+<p>The user-mode and kernel-mode jiffies come next, labeled utm and stm. These correspond to the utime and stime fields of the per-thread stat files in /proc. On sufficiently new versions of Dalvik, you’ll also see something like “HZ=100”, so you can double-check that jiffies are the length you expect. These numbers aren’t much use in isolation, except for seeing which threads are taking all the CPU time (if any).</p>
+</blockquote>
+<p>接下来是用户模式和内核模式 jiffies，标记为 <code>utm</code> 和 <code>stm</code>。这些对应于 <em>/proc</em> 中每个线程统计文件的 utime 和 stime 字段。在 Dalvik 的新版本中，你还会看到类似 “HZ = 100” 的内容，因此你可以仔细检查 jiffies 是否是你期望的长度。除了查看哪些线程正在占用所有 CPU 时间（如果有）之外，这些数字并没有太多用处。</p>
+<blockquote>
+<p>The cpu number of the core this thread was last executed on comes next, labeled core.</p>
+</blockquote>
+<p>接下来是最后执行该线程的核心的 CPU 号，标记为 <code>core</code>。</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://docs.oracle.com/cd/E13150_01/jrockit_jvm/jrockit/geninfo/diagnos/thread_basics.html" target="_blank" rel="noopener">Understanding Threads and Locks - Oracle</a><br><a href="https://stackoverflow.com/questions/19225859/difference-between-core-and-processor" target="_blank" rel="noopener">Difference between core and processor? - stackoverflow
+</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/21/Java-Nested-Classes-Java嵌套类/" rel="next" title="Java Nested Classes - Java嵌套类">
+                <i class="fa fa-chevron-left"></i> Java Nested Classes - Java嵌套类
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/10/Android-ANR-问题分析/" rel="prev" title="Android ANR 问题分析">
+                Android ANR 问题分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">neo1949</p>
+              <p class="site-description motion-element" itemprop="description">A man on the way to die.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/neo1949" target="_blank" title="Github">
+                      
+                        <i class="fa fa-fw fa-github"></i>Github</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Friends
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://jerey.cn/" title="夏敏的博客" target="_blank">夏敏的博客</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例及说明"><span class="nav-number">2.</span> <span class="nav-text">示例及说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一行参数说明"><span class="nav-number">2.1.</span> <span class="nav-text">第一行参数说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二行参数说明"><span class="nav-number">2.2.</span> <span class="nav-text">第二行参数说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三行参数说明"><span class="nav-number">2.3.</span> <span class="nav-text">第三行参数说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第四行参数说明"><span class="nav-number">2.4.</span> <span class="nav-text">第四行参数说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">3.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">neo1949</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
