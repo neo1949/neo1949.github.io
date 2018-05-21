@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="neo1949">
 <meta property="og:description" content="本文节选了 Nested Classes 官方文档的部分内容进行翻译，通过翻译过程系统地学习 Java 嵌套类。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-03T12:51:53.380Z">
+<meta property="og:updated_time" content="2018-04-03T13:03:23.520Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java Nested Classes - Java嵌套类">
 <meta name="twitter:description" content="本文节选了 Nested Classes 官方文档的部分内容进行翻译，通过翻译过程系统地学习 Java 嵌套类。">
@@ -341,6 +341,7 @@
 <h2 id="Nested-Classes-嵌套类"><a href="#Nested-Classes-嵌套类" class="headerlink" title="Nested Classes - 嵌套类"></a>Nested Classes - 嵌套类</h2><p>Java 编程语言允许在一个类中定义另一个类，这样的类被称为嵌套类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OuterClass</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">NestedClass</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>嵌套类分为两种：static（静态） 和 non-static (非静态)。声明为 <code>static</code> 的嵌套类称为静态嵌套类（static nested classes），非静态嵌套类称为内部类（inner classes）。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> OuterClass &#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">StaticNestedClass</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">InnerClass</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>嵌套类是封闭类的一个成员。非静态嵌套类可以访问封闭类的其它成员，即使它们被声明为 <code>private</code>。静态嵌套类无法访问封闭类的其它成员。作为外部类的一个成员，嵌套类可以声明为<code>private</code>、 <code>public</code>、<code>protected</code> 或 <code>package private</code>，回想一下外部类只能声明为 <code>public</code> 或者 <code>package private</code>。</p>
+<p>什么是 <code>package private</code>？如果一个类没有使用 <code>private</code>、 <code>public</code> 或者 <code>protected</code> 修饰，那么这个类具有 Java 提供的一种默认访问权限，这种权限通常称为包访问权限。在这种权限下，类可以访问在同一个包中的其它类的成员，但是在包之外，这些成员如同指定了 <code>private</code> 一样。</p>
 <h3 id="为何使用嵌套类"><a href="#为何使用嵌套类" class="headerlink" title="为何使用嵌套类"></a>为何使用嵌套类</h3><p>有以下几条令人信服的理由使用嵌套类：</p>
 <ul>
 <li>它是一种将只在一个地方使用的类进行逻辑分组的方式</li>
@@ -447,6 +448,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2018/04/09/translations_How-to-read-Dalvik-SIGQUIT-output/" rel="prev" title="【译】 How to read Dalvik SIGQUIT output">
+                【译】 How to read Dalvik SIGQUIT output <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -522,7 +527,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
