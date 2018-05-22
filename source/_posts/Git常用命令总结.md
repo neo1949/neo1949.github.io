@@ -208,13 +208,14 @@ git branch -a
 
 2.查看所有本地分支
 ```
-git branch
+git init
 ```
 
 3.查看所有远程分支
 ```
-git branch -r
+git clone url [local_repo_name]
 ```
+不指定本地仓库 local_repo_name 名称时，系统会默认创建与远程仓库名称相同的文件夹并将仓库拷贝到文件夹中。
 
 ### 创建分支
 1.创建分支
