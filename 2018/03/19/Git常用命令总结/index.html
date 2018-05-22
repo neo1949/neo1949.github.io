@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="添加文章描述内容">
+<meta name="description" content="首先建议大家阅读 官方文档，里面详细的介绍了 Git 的前世今生。官方文档基本提供了你需要的任何跟 Git 相关的东西，并且文档非常友好地提供了中文版。">
 <meta name="keywords" content="Git">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Git常用命令总结">
 <meta property="og:url" content="http://neo1949.cn/2018/03/19/Git常用命令总结/index.html">
 <meta property="og:site_name" content="neo1949">
-<meta property="og:description" content="添加文章描述内容">
+<meta property="og:description" content="首先建议大家阅读 官方文档，里面详细的介绍了 Git 的前世今生。官方文档基本提供了你需要的任何跟 Git 相关的东西，并且文档非常友好地提供了中文版。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-29T09:51:43.459Z">
+<meta property="og:updated_time" content="2018-05-22T06:31:20.969Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Git常用命令总结">
-<meta name="twitter:description" content="添加文章描述内容">
+<meta name="twitter:description" content="首先建议大家阅读 官方文档，里面详细的介绍了 Git 的前世今生。官方文档基本提供了你需要的任何跟 Git 相关的东西，并且文档非常友好地提供了中文版。">
 
 
 
@@ -336,22 +336,69 @@
       
 
       
-        <p>添加文章描述内容</p>
+        <p>首先建议大家阅读 <a href="https://git-scm.com/book/zh/v2/" target="_blank" rel="noopener">官方文档</a>，里面详细的介绍了 Git 的前世今生。官方文档基本提供了你需要的任何跟 Git 相关的东西，并且文档非常友好地提供了中文版。</p>
 <a id="more"></a>
-<h3 id="Git-分支"><a href="#Git-分支" class="headerlink" title="Git 分支"></a>Git 分支</h3><p>1.显示所有本地分支：当前分支以<code>*</code>高亮<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch</span><br></pre></td></tr></table></figure></p>
-<p>2.显示所有远程分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -r</span><br></pre></td></tr></table></figure></p>
-<p>3.显示所有本地和远程分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -a</span><br></pre></td></tr></table></figure></p>
-<p>4.删除本地分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -d branch_name</span><br></pre></td></tr></table></figure></p>
-<p>5.删除远程分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git push origin --delete branch_name</span><br><span class="line">git push origin :branch_name</span><br></pre></td></tr></table></figure></p>
-<p>第一种方式是 Git 官方手册介绍的删除远程分支的方法，官方手册对此命令有一段描述如下说明：“基本上这个命令做的只是从服务器上移除这个指针。 Git 服务器通常会保留数据一段时间直到垃圾回收运行，所以如果不小心删除掉了，通常是很容易恢复的。”</p>
-<p>第二种方式是网上介绍的另一种删除分支的方法，也可以删除远程分支，但不了解该命令是否有暂存数据的功能，所以最好使用官方介绍的删除分支方法。</p>
-<p>6.创建一个新的分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch branch_name</span><br></pre></td></tr></table></figure></p>
-<p>7.切换到指定分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout branch_name</span><br></pre></td></tr></table></figure></p>
-<p>8.新建一个分支并切换到新建的分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b branch_name</span><br></pre></td></tr></table></figure></p>
-<p>参数标注：</p>
-<ul>
-<li>branch_name : 操作的分支名称</li>
-</ul>
+<p>官方文档已经非常友好地提供了中文版，写这篇文章的目的不是为了重复造轮子，主要是用来是记录一些平时开发常用的命令，养成良好的总结和记录习惯对我们很有帮助。对于一些细枝末节，需要时到官方文档中查找即可。</p>
+<h2 id="安装和配置-Git"><a href="#安装和配置-Git" class="headerlink" title="安装和配置 Git"></a>安装和配置 Git</h2><p>安装 Git 请参照 <a href="https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-%E5%AE%89%E8%A3%85-Git" target="_blank" rel="noopener">安装 Git</a>，配置 Git 请参照 <a href="https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-%E5%88%9D%E6%AC%A1%E8%BF%90%E8%A1%8C-Git-%E5%89%8D%E7%9A%84%E9%85%8D%E7%BD%AE" target="_blank" rel="noopener">初次运行 Git 前的配置</a>。</p>
+<h3 id="查看配置信息"><a href="#查看配置信息" class="headerlink" title="查看配置信息"></a>查看配置信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --list</span><br></pre></td></tr></table></figure>
+<h3 id="配置单个项目的用户名和邮箱"><a href="#配置单个项目的用户名和邮箱" class="headerlink" title="配置单个项目的用户名和邮箱"></a>配置单个项目的用户名和邮箱</h3><p>有时我们想在当前项目中使用特定的用户名和邮箱，只要去掉 <code>--global</code> 选项或者使用 <code>--local</code> 选项重新配置即可，新的设定保存在当前项目的 .git/config 文件里：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config [--local] user.name &quot;local.name&quot;</span><br><span class="line">git config [--local] user.email &quot;local.email&quot;</span><br></pre></td></tr></table></figure></p>
+<p>查看配置信息可以看到末尾新增了刚才设置的用户名和邮箱。</p>
+<p>想要撤销单个项目配置的用户名和邮箱也很简单，只需要使用下面的命令即可：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --unset user.name</span><br><span class="line">git config --unset user.email</span><br></pre></td></tr></table></figure></p>
+<p>再次查看配置信息，可以看到本地配置的有户名和邮箱已经被删除了，提交代码时会默认使用全局配置的用户名和邮箱。</p>
+<h2 id="获取帮助的三种方式"><a href="#获取帮助的三种方式" class="headerlink" title="获取帮助的三种方式"></a>获取帮助的三种方式</h2><p>可以通过以下三种方法可以找到 Git 命令的使用手册：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git help &lt;verb&gt;</span><br><span class="line">git &lt;verb&gt; --help</span><br><span class="line">man git-&lt;verb&gt;</span><br></pre></td></tr></table></figure></p>
+<p>例如查看 config 命令的手册，执行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git help config</span><br></pre></td></tr></table></figure></p>
+<h2 id="Git-的三种状态"><a href="#Git-的三种状态" class="headerlink" title="Git 的三种状态"></a>Git 的三种状态</h2><p>在正式使用 Git 之前，需要了解 Git 中几个非常重要的概念。</p>
+<p>首先需要记住 Git 有三种状态，你的文件可能处于其中之一：已提交（committed）、已修改（modified）和已暂存（staged）。已提交表示数据已经安全的保存在本地数据库中。已修改表示修改了文件，但还没保存到数据库中。已暂存表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。</p>
+<p>由此引入 Git 项目的三个工作区域的概念：Git 仓库、工作目录以及暂存区域。</p>
+<p>Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地方。这是 Git 中最重要的部分，从其它计算机克隆仓库时，拷贝的就是这里的数据。</p>
+<p>工作目录是对项目的某个版本独立提取出来的内容。这些从 Git 仓库的压缩数据库中提取出来的文件，放在磁盘上供你使用或修改。</p>
+<p>暂存区域是一个文件，保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。有时候也被称作‘索引’，不过一般说法还是叫暂存区域。</p>
+<p>基本的 Git 工作流程如下：</p>
+<ol>
+<li>在工作目录中修改文件。</li>
+<li>暂存文件，将文件的快照放入暂存区域。</li>
+<li>提交更新，找到暂存区域的文件，将快照永久性存储到 Git 仓库目录。</li>
+</ol>
+<p>如果 Git 目录中保存着的特定版本文件，就属于已提交状态。 如果作了修改并已放入暂存区域，就属于已暂存状态。 如果自上次取出后，作了修改但还没有放到暂存区域，就是已修改状态。</p>
+<p>在使用 Git 命令时，需要牢记 Git 的三种状态以及三个工作区域的概念。</p>
+<h2 id="获取-Git-仓库"><a href="#获取-Git-仓库" class="headerlink" title="获取 Git 仓库"></a>获取 Git 仓库</h2><h3 id="创建一个新的仓库"><a href="#创建一个新的仓库" class="headerlink" title="创建一个新的仓库"></a>创建一个新的仓库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br></pre></td></tr></table></figure>
+<h3 id="克隆现有的仓库"><a href="#克隆现有的仓库" class="headerlink" title="克隆现有的仓库"></a>克隆现有的仓库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone url [local_repo_name]</span><br></pre></td></tr></table></figure>
+<p>不指定本地仓库 local_repo_name 名称时，系统会默认创建与远程仓库名称相同的文件夹并将仓库拷贝到文件夹中。</p>
+<h2 id="记录每次更新到仓库"><a href="#记录每次更新到仓库" class="headerlink" title="记录每次更新到仓库"></a>记录每次更新到仓库</h2><p>1.查看当前文件的状态<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br></pre></td></tr></table></figure></p>
+<p>2.跟踪新文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add filename</span><br></pre></td></tr></table></figure></p>
+<p>3.查看修改<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff [--cached] [filename]</span><br></pre></td></tr></table></figure></p>
+<p><code>git diff</code> 本身只显示尚未暂存的改动，而不是自上次提交以来所做的所有改动。如果不指定文件名称，默认会比较本地所有已跟踪但未暂存的修改。</p>
+<p>若要查看已暂存的将要添加到下次提交里的内容，可以用 <code>git diff –cached</code> 命令。（Git 1.6.1 及更高版本还允许使用 <code>git diff –staged</code>，效果相同但更好记些。）</p>
+<p>4.移除文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rm filename</span><br></pre></td></tr></table></figure></p>
+<p>要从 Git 中移除某个文件，就必须要从已跟踪文件清单中移除（确切地说，是从暂存区域移除），然后提交。可以用 <code>git rm</code> 命令完成此项工作，并连带从工作目录中删除指定的文件，这样以后就不会出现在未跟踪文件清单中了。</p>
+<p><strong>5.将文件从暂存区移除</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rm --cached filename</span><br></pre></td></tr></table></figure></p>
+<p>已添加到暂存区的文件会被移除，但是本地的修改不会被删除，仍然保留工作在工作目录中。</p>
+<p>6.移动文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git mv file_from file_to</span><br></pre></td></tr></table></figure></p>
+<p>如果我们想要重命名文件或者将文件移动到另一个文件夹下面，可以使用此种方式。</p>
+<p>7.提交更新到本地仓库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit -m &quot;commit message&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="git-log"><a href="#git-log" class="headerlink" title="git log"></a>git log</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log</span><br></pre></td></tr></table></figure>
+<p>按提交时间列出所有的更新，列出每个提交的 SHA-1 校验和、作者的名字和电子邮件地址、提交时间以及提交说明。</p>
+<p>1.显示指定文件所有的更新<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log filename</span><br></pre></td></tr></table></figure></p>
+<p>2.显示最近n次的提交记录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log -n</span><br></pre></td></tr></table></figure></p>
+<p>3.显示每次提交的内容差异<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log -p</span><br></pre></td></tr></table></figure></p>
+<p>以上参数可以混合使用。例如，查看 README 文件最近两次提交的内容差异：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log -p -2 README.md</span><br></pre></td></tr></table></figure></p>
+<p>4.查看每次提交的简略统计信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log --stat</span><br></pre></td></tr></table></figure></p>
+<p><code>--stat</code> 选项在每次提交的下面列出所有被修改过的文件、有多少文件被修改了以及被修改过的文件的哪些行被移除或是添加了。在每次提交的最后还有一个总结。</p>
+<p>5.使用 <code>--pretty=oneline</code> 将每个提交放在一行显示，查看的提交数很大时非常有用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log --pretty=oneline</span><br></pre></td></tr></table></figure></p>
+<p>关于 <code>git log</code> 的一些更高级用法请参考 <a href="https://git-scm.com/book/zh/v2/Git-%E5%9F%BA%E7%A1%80-%E6%9F%A5%E7%9C%8B%E6%8F%90%E4%BA%A4%E5%8E%86%E5%8F%B2" target="_blank" rel="noopener">查看提交历史</a> 章节。</p>
+<h2 id="git-branch"><a href="#git-branch" class="headerlink" title="git branch"></a>git branch</h2><h3 id="查看分支"><a href="#查看分支" class="headerlink" title="查看分支"></a>查看分支</h3><p>1.查看所有分支信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -a</span><br></pre></td></tr></table></figure></p>
+<p>2.查看所有本地分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch</span><br></pre></td></tr></table></figure></p>
+<p>3.查看所有远程分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -r</span><br></pre></td></tr></table></figure></p>
+<h3 id="创建分支"><a href="#创建分支" class="headerlink" title="创建分支"></a>创建分支</h3><p>1.创建分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch branch_name</span><br></pre></td></tr></table></figure></p>
+<p>2.切换到指定分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout branch_name</span><br></pre></td></tr></table></figure></p>
+<p>3.创建分支并切换到指定分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b branch_name</span><br></pre></td></tr></table></figure></p>
+<p>4.将本地分支推送远程仓库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin branch_name</span><br></pre></td></tr></table></figure></p>
+<h3 id="删除分支"><a href="#删除分支" class="headerlink" title="删除分支"></a>删除分支</h3><p>1.删除本地分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -d branch_name</span><br></pre></td></tr></table></figure></p>
+<p>2.强制删除本地分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -D branch_name</span><br></pre></td></tr></table></figure></p>
+<p>3.删除远程仓库的分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin --delete branch_name</span><br></pre></td></tr></table></figure></p>
+<p>官方文档对这个命令有一段说明：基本上这个命令做的只是从服务器上移除这个指针。Git 服务器通常会保留数据一段时间直到垃圾回收运行，所以如果不小心删除掉了，通常是很容易恢复的。</p>
+<p>网上还介绍了一种删除远程分支的方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin :branch_name</span><br></pre></td></tr></table></figure></p>
+<p>这种方式也可以删除远程仓库里的分支，但是是否会保留数据未知，所以如果误删除了某个分支，可能无法恢复数据，为了安全起见，不推荐使用此种方式删除远程分支。</p>
 <h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="https://git-scm.com/book/zh/v2" target="_blank" rel="noopener">Git 官方中文手册</a></p>
 
       
@@ -472,7 +519,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -542,7 +589,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-分支"><span class="nav-number">1.</span> <span class="nav-text">Git 分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文章"><span class="nav-number">2.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装和配置-Git"><span class="nav-number">1.</span> <span class="nav-text">安装和配置 Git</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看配置信息"><span class="nav-number">1.1.</span> <span class="nav-text">查看配置信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置单个项目的用户名和邮箱"><span class="nav-number">1.2.</span> <span class="nav-text">配置单个项目的用户名和邮箱</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取帮助的三种方式"><span class="nav-number">2.</span> <span class="nav-text">获取帮助的三种方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-的三种状态"><span class="nav-number">3.</span> <span class="nav-text">Git 的三种状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取-Git-仓库"><span class="nav-number">4.</span> <span class="nav-text">获取 Git 仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建一个新的仓库"><span class="nav-number">4.1.</span> <span class="nav-text">创建一个新的仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#克隆现有的仓库"><span class="nav-number">4.2.</span> <span class="nav-text">克隆现有的仓库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#记录每次更新到仓库"><span class="nav-number">5.</span> <span class="nav-text">记录每次更新到仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-log"><span class="nav-number">6.</span> <span class="nav-text">git log</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-branch"><span class="nav-number">7.</span> <span class="nav-text">git branch</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看分支"><span class="nav-number">7.1.</span> <span class="nav-text">查看分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建分支"><span class="nav-number">7.2.</span> <span class="nav-text">创建分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除分支"><span class="nav-number">7.3.</span> <span class="nav-text">删除分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文章"><span class="nav-number">7.4.</span> <span class="nav-text">参考文章</span></a></li></ol></li></ol></div>
             
 
           </div>

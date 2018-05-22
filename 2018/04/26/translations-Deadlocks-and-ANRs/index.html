@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="neo1949">
 <meta property="og:description" content="原文：Deadlocks and ANRs">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-27T01:45:55.070Z">
+<meta property="og:updated_time" content="2018-04-27T02:55:31.862Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="【译】Deadlocks and ANRs">
 <meta name="twitter:description" content="原文：Deadlocks and ANRs">
@@ -338,17 +338,17 @@
         <p>原文：<a href="http://zenandroid.io/deadlocks-and-anrs/#ananalogyfordeadlocks" target="_blank" rel="noopener">Deadlocks and ANRs</a></p>
 <a id="more"></a>
 <p>在本文中，我们将看看如何分析实际的应用程序无响应（ANR）跟踪，确定原因（结果是我们正在使用的某个库中存在死锁）并消除它。我们也将借此机会提供关于理解本文所需的死锁和相关计算机科学主题的简短入门。</p>
-<h2 id="关于互斥和死锁的入门"><a href="#关于互斥和死锁的入门" class="headerlink" title="关于互斥和死锁的入门"></a>关于互斥和死锁的入门</h2><p>我们先看看死锁和互斥是什么。熟悉这些主题的人可以跳到“解释ANR痕迹”部分。</p>
-<p>请记住，这并不是对这个主题的详尽处理（这是相当复杂和有趣的），而是针对那些大学以外的人而言的简短入门书。</p>
-<h3 id="什么是互斥"><a href="#什么是互斥" class="headerlink" title="什么是互斥"></a>什么是互斥</h3><p>在计算机科学中，互斥 <code>mutex</code>（<strong>mutual exclustion</strong> 的缩写）是一种对象，一次只允许一个线程在代码的关键部分访问共享资源（如文件）。在某些语言中（最引人注目的是Java），它被称为 <code>Lock</code>，我们将交替使用这些术语。</p>
-<p>它通常有两种方法：<code>acquire</code> 和 <code>release</code>（有时称为 <code>lock</code> 和 <code>unlock</code>）。操作系统内核保证一旦一个线程成功获得 <code>lock</code>，在第一个线程释放它之前，其他线程不能获取它。尝试这样做会阻止第二个线程，直到 <code>lock</code> 再次可用。因此，如果所有线程都确保只使用调用之间的共享资源来获取和释放它们，则保证轮流使用该资源。</p>
-<h3 id="互斥的类比"><a href="#互斥的类比" class="headerlink" title="互斥的类比"></a>互斥的类比</h3><p>为了更好地理解互斥体，设想一个相似的物理世界模式很有帮助。例如，在一些敏捷团队中，习惯使用 “speaking token”（例如球或白板标记）来随时跟踪谁应该说话。只有持有令牌的人才可以发言。当这个人完成时，令牌被放在桌子上，其他人（不一定按顺序）将其拿起并发送他或她的报告。</p>
+<h2 id="关于互斥和死锁的入门"><a href="#关于互斥和死锁的入门" class="headerlink" title="关于互斥和死锁的入门"></a>关于互斥和死锁的入门</h2><p>我们先看看死锁和互斥是什么。熟悉这部分的人可以跳到 “理解 ANR traces” 部分。</p>
+<p>请记住，这并不是要对这个主题进行详尽的处理（这是相当复杂和有趣的），而是为那些刚从大学毕业的人提供一个简短的入门介绍。</p>
+<h3 id="什么是互斥"><a href="#什么是互斥" class="headerlink" title="什么是互斥"></a>什么是互斥</h3><p>在计算机科学中，互斥 <code>mutex</code>（<strong>mutual exclustion</strong> 的缩写）是一种对象，一次只允许一个线程在代码的关键部分访问共享资源（如文件）。在某些语言中（如 Java），它被称为 <code>Lock</code>，我们将交替使用这些术语。</p>
+<p>它通常有两种方法：<code>acquire</code> 和 <code>release</code>（有时称为 <code>lock</code> 和 <code>unlock</code>）。操作系统内核保证一旦一个线程成功获得 <code>lock</code>，在第一个线程释放它之前，其他线程不能获取它。尝试获取 <code>lock</code> 会阻塞第二个线程，直到 <code>lock</code> 再次可用。因此，如果所有线程都确保只在 <code>acquire</code> 和 <code>release</code> 调用之间使用共享资源，那么它们会被保证轮流使用该资源。</p>
+<h3 id="互斥的类比"><a href="#互斥的类比" class="headerlink" title="互斥的类比"></a>互斥的类比</h3><p>为了更好地理解互斥体，设想一个相似的物理世界模式很有帮助。例如，在一些敏捷团队中，习惯使用 “speaking token”（例如球或白板标记）来跟踪谁何时可以发言。只有持有令牌的人才可以发言。当这个人完成时，令牌被放在桌子上，其他人（不一定按顺序）将其拿起并提交他（她）的报告。</p>
 <p>互斥体以类似的方式工作：线程类似于团队成员，共享资源是同事关注的，而互斥体则由 “speaking token” 表示。锁定互斥体与拾取令牌相似，而解锁它与将令牌重新放回桌子中间相似。</p>
-<h3 id="互斥在行为上的表现"><a href="#互斥在行为上的表现" class="headerlink" title="互斥在行为上的表现"></a>互斥在行为上的表现</h3><p>让我们考虑两个线程：<code>ThreadA</code> 和 <code>ThreadB</code> 尝试写入日志文件。假设他们正在尝试写入 “Hello world from ThreadA” and “Hello world from ThreadB”.</p>
+<h3 id="互斥在行为上的表现"><a href="#互斥在行为上的表现" class="headerlink" title="互斥在行为上的表现"></a>互斥在行为上的表现</h3><p>让我们考虑两个线程：<code>ThreadA</code> 和 <code>ThreadB</code> 尝试写入日志文件。假设他们正在尝试写入 “Hello world from ThreadA” 和 “Hello world from ThreadB”。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;  </span><br><span class="line">    <span class="keyword">final</span> FileOutputStream fos = <span class="keyword">new</span> FileOutputStream(File.createTempFile(<span class="string">"log"</span>, <span class="string">".txt"</span>));</span><br><span class="line"></span><br><span class="line">    Runnable r = <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                fos.write((<span class="string">"Hello world from "</span> + Thread.currentThread().getName()).getBytes());</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">new</span> Thread(r, <span class="string">"ThreadA"</span>).start();</span><br><span class="line">    <span class="keyword">new</span> Thread(r, <span class="string">"ThreadB"</span>).start();</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">    ex.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>即使没有同步，大多数情况下这也会产生预期的效果。然而有时候，或许一千次运行才会出现一次，你会看到这样的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hello worHello world from ThreadB  </span><br><span class="line">ld from ThreadA</span><br></pre></td></tr></table></figure></p>
 <p>这里发生的是 ThreadB 生成它的输出，而 ThreadA 正在生成它自己的文件，并且文件最终被损坏。解决这个问题的方法是使用一个互斥体（在 Java 中称为 <code>Lock</code>）：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;  </span><br><span class="line">    <span class="keyword">final</span> FileOutputStream fos = <span class="keyword">new</span> FileOutputStream(File.createTempFile(<span class="string">"log"</span>, <span class="string">".txt"</span>));</span><br><span class="line">    <span class="keyword">final</span> Lock fileLock = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line"></span><br><span class="line">    Runnable r = <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                fileLock.lock();</span><br><span class="line">                <span class="comment">// Thread is now guaranteed exclusive access</span></span><br><span class="line">                fos.write((<span class="string">"Hello world from "</span> + Thread.currentThread().getName()).getBytes());</span><br><span class="line">                fileLock.unlock();</span><br><span class="line">                <span class="comment">// Thread no longer has exclusive access</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">new</span> Thread(r, <span class="string">"ThreadA"</span>).start();</span><br><span class="line">    <span class="keyword">new</span> Thread(r, <span class="string">"ThreadB"</span>).start();</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">    ex.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>有了这个补充，就避免了前面描述的情况。在它可以写入文件之前，线程必须获取互斥锁（锁），如果两者同时尝试这样做，Android Linux 内核保证只有一个从方法调用返回而另一个被阻塞直到第一个释放互斥锁。</p>
+<p>有了这个补充，就避免了前面描述的情况。在它可以写入文件之前，线程必须获取互斥体（锁），如果两者同时尝试这样做，Android Linux 内核保证只有一个从方法调用返回，而另一个被阻塞直到第一个释放互斥锁。</p>
 <h3 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h3><p>虽然互斥体在正确使用时功能非常强大，但它们确实有可能导致一个罕见且难以捉摸的问题，称为死锁。这通常发生在两个线程都尝试获取另一个线程所拥有的互斥体时。这导致它们都被永久阻塞住。在 Android 上，如果线程对于运行应用程序是必不可少的（例如，如果其中一个线程是主线程），它很可能会导致 ANR（应用程序无响应）和应用程序崩溃。</p>
 <p>死锁是出了名的不得不处理地令人讨厌的问题。造成这种情况的主要原因是非常低的复现率以及缺乏详细记录问题的日志。后一个问题是由于没有抛出错误/异常的事实造成的。唯一的症状是缺乏输出，以及应用程序没有响应任何消息（例如按键，意图广播等），这反过来又导致 Android 系统通过对话框提示用户，询问他或她是否希望杀死应用程序（臭名昭著的ANR）。</p>
 <h3 id="死锁的类比"><a href="#死锁的类比" class="headerlink" title="死锁的类比"></a>死锁的类比</h3><p>在尝试说明死锁时，我们在现实生活的类比显得有点捉襟见肘，但让我们试一试吧。假设小明和小红负责管理对两个共享资源的访问，比如日志文件和数据库连接。小明和小红约定，任何想使用数据库的人都必须持有特定的红色标记，而任何想要访问日志文件的人都必须持有特定的黑色标记。</p>
@@ -361,15 +361,15 @@
 <li>在仍然拿着黑色标记的同时，小红也尝试获取红色标记以检查一些数据库活动。</li>
 <li>由于红色标记不可用，小红停下来并等待小明完成它。</li>
 </ol>
-<p>正如你所看到的，小红和小明现在都拥有其中一个标记，并等待另一个人释放他们的标记。现在无法取得任何进展，活动将永久阻塞。我们陷入了僵局。</p>
-<h3 id="解决死锁"><a href="#解决死锁" class="headerlink" title="解决死锁"></a>解决死锁</h3><p>如果在你的代码当中检测到了这种情况，解决这个问题的方法是改变获取锁的顺序。这种策略有事被称为建立互斥体层次结构。比方说小明和小红为了获得两个标记，约定必须首先抓住红色标记，然后再抓住黑色标记（而不是反过来）。上面的情景会如此展开：</p>
+<p>正如你所看到的，小红和小明现在都拥有其中一个标记，并等待另一个人释放他们的标记。现在无法取得任何进展，活动将永久阻塞。我们遇到了死锁。</p>
+<h3 id="解决死锁"><a href="#解决死锁" class="headerlink" title="解决死锁"></a>解决死锁</h3><p>如果在你的代码当中检测到了这种情况，解决这个问题的方法是改变获取锁的顺序。这种策略有时被称为建立互斥体层次结构。比方说小明和小红为了获得两个标记，约定必须首先抓住红色标记，然后再抓住黑色标记（而不是反过来）。上面的情景会如此展开：</p>
 <ol>
 <li>小明抓住红色标记并开始写入数据库。</li>
 <li>小红抓住黑色标记并开始写入一些日志。</li>
 <li>在仍然保持红色标记的提示，小明也尝试获取黑色标记以写入关于数据库活动的日志。</li>
 <li>由于黑色标记不可用，小明停下来等到小红完成它。</li>
 <li>小红需要两个标记，但由于上述协议，她首先释放黑色标记。</li>
-<li>小红现在尝试获取红色标记，但是由于它不可用，她停下来等待鲍勃完成它。</li>
+<li>小红现在尝试获取红色标记，但是由于它不可用，她停下来等待小明完成它。</li>
 <li>小明抓住黑色标记（现在可用）并执行他的工作。</li>
 <li>小明释放黑色标记</li>
 <li>小明释放红色标记。</li>
@@ -379,9 +379,9 @@
 <li>小红释放黑色标记。</li>
 <li>小红释放红色标记。</li>
 </ol>
-<p>因此，这种规则没有可能出现死锁。</p>
-<h2 id="处理-ANR"><a href="#处理-ANR" class="headerlink" title="处理 ANR"></a>处理 ANR</h2><p>如果你的应用程序不幸以 ANR 结束，那么你将不得不使用的唯一东西就是 stats 和 ANR 跟踪。你可能无法重现它，而且你从用户那里得到的反馈在最好的情况是毫无用处，最坏的情况是产生误导。</p>
-<p>首先，请注意，如果你使用某些第三方报告崩溃的方式（如HockeyApp），你的ANR将不会显示在那里。你必须转到 Google Play 控制台，点击 Crashes &amp; ANRs，并确保将切换按钮设置为 ANR。然后选择表格中显示的问题之一，现在你会看到统计信息和 ANR 跟踪。</p>
+<p>因此，使用这种规则不可能出现死锁。</p>
+<h2 id="处理-ANR"><a href="#处理-ANR" class="headerlink" title="处理 ANR"></a>处理 ANR</h2><p>如果你的应用程序不幸以 ANR 结束，那么你将不得不使用的唯一东西就是统计数据和 ANR trace。你可能无法重现它，而且你从用户那里得到的反馈在最好的情况下是毫无用处，最坏的情况下是产生误导。</p>
+<p>首先，请注意，如果你使用某些第三方报告崩溃的方式（如HockeyApp），你的ANR将不会显示在那里。你必须转到 Google Play 控制台，点击 Crashes &amp; ANRs，并确保将切换按钮设置为 ANR。然后选择表格中显示的问题之一，现在你会看到统计信息和 ANR trace。</p>
 <p>首先看看统计数据。这些可以告诉你哪些 Android 版本和手机受到影响，以及问题何时开始（通常是其中一个应用版本）。</p>
 <p>然后你必须查看 ANR traces。这些一开始看起来很吓人，但只要耐心一点，你就可以理解它们。</p>
 <h3 id="理解-ANR-traces"><a href="#理解-ANR-traces" class="headerlink" title="理解 ANR traces"></a>理解 ANR traces</h3><p>ANR trace 与你在各种异常（例如 <code>NullPointerException</code>）中获得的更为熟悉的堆栈跟踪非常相似，但有一些显著的差异：</p>
@@ -408,18 +408,15 @@
 <p>现在让我们在 trace 中搜索线程15：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&quot;pool-8-thread-1&quot; prio=5 tid=15 Blocked</span><br><span class="line">  | group=&quot;main&quot; sCount=1 dsCount=0 obj=0x12c0d4c0 self=0x5598cd6440</span><br><span class="line">  | sysTid=26006 nice=0 cgrp=top_visible sched=0/0 handle=0x7f61646450</span><br><span class="line">  | state=S schedstat=( 64174864 5461664 62 ) utm=6 stm=0 core=3 HZ=100</span><br><span class="line">  | stack=0x7f61544000-0x7f61546000 stackSize=1037KB</span><br><span class="line">  | held mutexes=</span><br><span class="line">  at com.google.android.gms.tagmanager.zzo.zza(unavailable:-1)</span><br><span class="line">  - waiting to lock &lt;0x023ef607&gt; (a com.google.android.gms.tagmanager.zzo) held by thread 1</span><br><span class="line">  at com.google.android.gms.tagmanager.zzp.zza(unavailable:-1)</span><br><span class="line">  - locked &lt;0x08362446&gt; (a com.google.android.gms.tagmanager.zzp)</span><br><span class="line">  at com.google.android.gms.tagmanager.zzp.zza(unavailable:-1)</span><br><span class="line">  at com.google.android.gms.tagmanager.zzp$zzc.zzb(unavailable:-1)</span><br><span class="line">  - locked &lt;0x08362446&gt; (a com.google.android.gms.tagmanager.zzp)</span><br><span class="line">  at com.google.android.gms.tagmanager.zzp$zzc.onSuccess(unavailable:-1)</span><br><span class="line">  at com.google.android.gms.tagmanager.zzct.zzPD(unavailable:-1)</span><br><span class="line">  at com.google.android.gms.tagmanager.zzct.run(unavailable:-1)</span><br><span class="line">  at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:423)</span><br><span class="line">  at java.util.concurrent.FutureTask.run(FutureTask.java:237)</span><br><span class="line">  at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(ScheduledThreadPoolExecutor.java:154)</span><br><span class="line">  at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:269)</span><br><span class="line">  at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1113)</span><br><span class="line">  at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:588)</span><br><span class="line">  at java.lang.Thread.run(Thread.java:833)</span><br></pre></td></tr></table></figure></p>
 <p>第一行再次告诉我们线程被阻塞，那么我们就来看看造成阻塞的原因：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">at com.google.android.gms.tagmanager.zzo.zza(unavailable:-1)</span><br><span class="line">- waiting to lock &lt;0x023ef607&gt; (a com.google.android.gms.tagmanager.zzo) held by thread 1</span><br></pre></td></tr></table></figure></p>
 <p>我们看到这个线程正在等待由线程1（主线程）持有的另一个互斥体（称为 com.google.android.gms.tagmanager.zzo）。因此，我们看到线程1正在等待线程15，而线程15正在等待线程1。我们发现了死锁。</p>
-<h3 id="解决死锁-1"><a href="#解决死锁-1" class="headerlink" title="解决死锁"></a>解决死锁</h3><blockquote>
-<p>Looking at the stack trace of thread 15 reveals that it does not pass through our code at all. By the look of the trace (note names such as ThreadPoolExecutor, FutureTask.run() and onSuccess) we could put forward an educated guess that this is part of an internal callback that is run when a backend call returns successfully, but sadly we cannot know for sure since the library is not open-source (Boo, Google!).</p>
-</blockquote>
-<p>查看线程15的堆栈跟踪，发现它根本没有通过我们的代码。通过跟踪 trace（注意名称，例如 ThreadPoolExecutor，FutureTask.run() 和 onSuccess），我们可以提出一个有根据的猜测，这是内部回调的一部分，当后端调用成功返回时运行，但遗憾的是我们无法确切地知道，因为库不是开源的（Boo，Google！）。</p>
-<p>看看主线程堆栈，尽管我们看到我们确实通过了自己的代码</p>
+<h3 id="解决死锁-1"><a href="#解决死锁-1" class="headerlink" title="解决死锁"></a>解决死锁</h3><p>查看线程15的堆栈跟踪，发现它根本没有通过我们的代码。通过跟踪 trace（注意名称，例如 ThreadPoolExecutor，FutureTask.run() 和 onSuccess），我们可以提出一个有根据的猜测，这是内部回调的一部分，当后端调用成功返回时运行，但遗憾的是我们无法确切地知道，因为库不是开源的（Boo，Google！）。</p>
+<p>看看主线程堆栈，尽管我们看到我们确实通过了自己的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">at com.google.android.gms.tagmanager.zzo.refresh(unavailable:-1)</span><br><span class="line">  - locked &lt;0x023ef607&gt; (a com.google.android.gms.tagmanager.zzo)</span><br><span class="line">  at com.example.MyApplication$1.onSuccess(MyApplication.java:176)</span><br><span class="line">  at com.example.MyApplication$1.onSuccess(MyApplication.java:169)</span><br><span class="line">  at com.example.callback.GenericCallBack.handleSuccess(GenericCallBack.java:39)</span><br></pre></td></tr></table></figure></p>
 <p>让我们快速浏览一下有问题的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">loadGTMContainer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mAnalyticsService.loadGTMContainer(<span class="keyword">new</span> GenericCallBack&lt;ContainerHolder&gt;() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(ContainerHolder result)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">                LOGGER.debug(<span class="string">"Google Tag Manager container loaded successfully"</span>);</span><br><span class="line">                <span class="comment">//manually refresh the container, just in case</span></span><br><span class="line">                result.refresh();</span><br><span class="line">                <span class="comment">//...</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Exception e)</span> </span>&#123;</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>堆栈似乎表明死锁发生在 result.refresh() 内部，事实上，上面的行（和上面的注释）似乎是可疑的。看起来刷新行是可选的（并导致 GTM 内部的问题），所以很有可能删除它也会消除死锁。但是如果不能可靠地重现错误，则无法确定。</p>
-<p>现在是时候对“Google 跟踪代码管理器”，“死锁”和“刷新”这个主题进行一些研究。迟早你会从谷歌自己的论坛中找到这个<a href="https://productforums.google.com/forum/#!topic/tag-manager/wlPpNKPXvu8" target="_blank" rel="noopener">链接</a>。在那个发布于2014年的<br>晦涩难懂的论坛帖子中，你可以找到 GTM 库的一位开发人员，他承认在下列情况时会存在错误:</p>
+<p>现在是时候对 “Google 跟踪代码管理器”，“死锁” 和 “刷新” 这个主题进行一些研究了。迟早你会从谷歌自己的论坛中找到这个<a href="https://productforums.google.com/forum/#!topic/tag-manager/wlPpNKPXvu8" target="_blank" rel="noopener">链接</a>。在那个发布于2014年的晦涩难懂的论坛帖子中，你可以找到 GTM 库的一位开发人员，他承认在下列情况时会存在错误:</p>
 <blockquote>
 <p> 应用程序中的代码可能正在调用容器上的刷新，同时它正在保存从网络中检索到的容器的最新版本。[…] 减少死锁几率的一种方法是避免在初始加载期间调用刷新，以及在自动刷新发生时的时间间隔。入门文档没有详细说明，但容器会按照每隔12小时的间隔自动刷新。[…] 我们将在未来的版本中解决这个死锁。</p>
 </blockquote>
-<p>正如它经常发生的那样，未来版本的修复甚至在3年后都没有发生，我不会因为它在近期内可能到来而屏住呼吸。但是，似乎确实是这样的，refresh() 调用确实是无用的，并且它可能是罪魁祸首。</p>
+<p>正如经常发生的那样，未来版本的修复甚至在3年后都没有发生，我不会因为它在近期内可能到来而屏住呼吸。但是，似乎确实是这样的，refresh() 调用确实是无用的，并且它可能是罪魁祸首。</p>
 <p>接下来的步骤是删除该行，对 GTM 库功能进行完整的回归测试，然后发布新版本，密切关注统计数据，我们希望看到 ANR 数量急剧下降。</p>
 <p>如果你不幸无法找到一些关于你具体情况的论坛主题呢？那么这个问题就很复杂了，但是至少知道你有几个解决罪魁祸首的途径。 如果在互联网上搜索解决方案不会产生结果，我会尝试以下操作（或多或少按此顺序）：</p>
 <ul>
@@ -428,7 +425,7 @@
 <li>尝试重写有问题的代码</li>
 <li>如果一切都不可行，请使用可替选的方案代替有问题的库（例如在本例中使用 Firebase）</li>
 </ul>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>在这篇文章中，我尝试阐明 ANR 和死锁的一些点，并展示如何在分析它们并找到它们的最终原因方面获得一些指引。我们已经看了它们是什么以及它们如何运作，我们也介绍了一个如何解决这个问题的示例。希望这将在未来对你有用。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>在这篇文章中，我尝试阐明 ANR 和死锁的一些点，并向你展示如何在分析它们并找到它们的最终原因方面获得一些指引。我们已经看了它们是什么以及它们如何运作，我们也介绍了一个如何解决这个问题的示例。希望这将在未来对你有用。</p>
 
       
     </div>
@@ -462,6 +459,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/10/android-memory-analysis/" rel="prev" title="Android 内存分析">
+                Android 内存分析 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -538,7 +539,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
