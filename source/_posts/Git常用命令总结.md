@@ -124,7 +124,7 @@ git mv file_from file_to
 git commit -m "commit message"
 ```
 
-## git log
+## Git 提交记录 - git log
 ```
 git log
 ```
@@ -274,7 +274,7 @@ git remote rm remote-name
 ```
 如果因为一些原因想要移除一个远程仓库：你已经从服务器上搬走了或不再想使用某一个特定的镜像了，又或者某一个贡献者不再贡献了，可以使用上面的命令删除某个远程仓库。
 
-## git tag
+## Git 标签 - git tag
 Git 可以给历史中的某一个提交打上标签，通常用来标记发布结点。
 
 ### 列出标签
@@ -337,7 +337,10 @@ $ git checkout v0.2
 ```
 有时候我们会需要一个特定版本的程序，可以通过上面的方法先下载指定版本的代码，然后编译程序即可。
 
-## git branch
+## Git 别名
+强烈建议不要一开始就使用别名，一定要在熟练使用 Git 之后再使用别名，具体请自行参考 [Git 别名](https://git-scm.com/book/zh/v2/Git-%E5%9F%BA%E7%A1%80-Git-%E5%88%AB%E5%90%8D)。
+
+## Git 分支 - git branch
 ### 查看分支
 1.查看所有分支信息
 ```
