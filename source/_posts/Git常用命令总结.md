@@ -340,41 +340,178 @@ $ git checkout v0.2
 ## Git 别名
 强烈建议不要一开始就使用别名，一定要在熟练使用 Git 之后再使用别名，具体请自行参考 [Git 别名](https://git-scm.com/book/zh/v2/Git-%E5%9F%BA%E7%A1%80-Git-%E5%88%AB%E5%90%8D)。
 
-## Git 分支 - git branch
-### 查看分支
-1.查看所有分支信息
-```
-git branch -a
-```
+## Git 分支
+### 分支简介
+想要真正理解 Git 处理分支的方式，首先需要了解 Git 是如何保存数据的。
 
-2.查看所有本地分支
-```
-git init
-```
+Git 保存的不是文件的变化或者差异，而是一系列不同时刻的文件快照。
 
-3.查看所有远程分支
-```
-git clone url [local-repo-name]
-```
-不指定本地仓库 local-repo-name 名称时，系统会默认创建与远程仓库名称相同的文件夹并将仓库拷贝到文件夹中。
+在进行提交操作时，Git 会保存一个提交对象（commit object）。知道了 Git 保存数据的方式，我们可以很自然的想到——该提交对象会包含一个指向暂存内容快照的指针。但不仅仅是这样，该提交对象还包含了作者的姓名和邮箱、提交时输入的信息以及指向它的父对象的指针。首次提交产生的提交对象没有父对象，普通提交操作产生的提交对象有一个父对象，而由多个分支合并产生的提交对象有多个父对象：
+
+![commit object](http://p5ia12npj.bkt.clouddn.com/commit_object.png)
+
+当使用 <code>git commit</code> 进行提交操作时，Git 会先计算每一个子目录的校验和，然后在 Git 仓库中这些校验和保存为树对象。随后，Git 便会创建一个提交对象，它除了包含上面提到的那些信息外，还包含指向这个树对象（项目根目录）的指针。如此一来，Git 就可以在需要的时候重现此次保存的快照。
 
 ### 创建分支
-1.创建分支
+Git 在创建分支时，只是创建了一个可以移动的新的指针：
 ```
 git branch new-branch
 ```
 
-2.切换到指定分支
+Git 有一个名为 <code>HEAD</code> 的特殊指针，指向当前所在的本地分支。
+
+使用 <code>git log -\-decorate</code> 可以查看各个分支当前所指的对象：
+```
+$ git log --decorate --oneline
+aed99ae (HEAD, tag: v0.3, origin/master, master) Summary: add tag.md for test
+67aa248 (tag: v0.2) Create TestFetch.md
+4ee2795 Summary: remove Chapter_02_branch.md
+a7e5abc Summary: update Chapter_02_branch.md
+80d1cf2 Summary: add Chapter_02_branch.md
+e07e4ca (origin/tmp, origin/dev, tmp, test, dev) Merge branch 'master' of github.com:neo1949/GitTest
+2d9c922 Summary: update Chapter_01_init.md
+a5d6af0 Summary: update Chapter_01_init.md
+bb3fb11 Merge branch 'master' of github.com:neo1949/GitTest
+b9c24d5 Summary: update Chapter_01_init.md
+c11ceb1 Summary: update Chapter_01_init.md
+c349273 Merge branch 'master' of github.com:neo1949/GitTest
+0b90633 Summary: create a git repo
+75b684b (tag: v0.1) Update README.md
+0adb202 Initial commit
+```
+可以看到 <code>master</code> 分支指向 <code>aed99ae</code> 开头的提交对象，而 <code>tmp</code> 和 <code>dev</code> 分支则指向 <code>e07e4ca</code> 开头的提交对象。
+
+### 切换分支
+切换到指定分支：
 ```
 git checkout branch-name
 ```
 
-3.创建分支并切换到指定分支
+创建分支并切换到新的分支：
 ```
 git checkout -b new-branch
 ```
 
-4.将本地分支推送远程仓库
+创建一个新分支后并切换过去进行了一些工作，随后又切换回 master 分支进行了另外一些工作，提交到仓库之后，这个项目的提交历史就产生了分叉，可以用下面的方式查看项目分叉历史：
+```
+$ git log --decorate --oneline --graph --all
+* aed99ae (HEAD, tag: v0.3, origin/master, master) Summary: add tag.md for test
+* 67aa248 (tag: v0.2) Create TestFetch.md
+* 4ee2795 Summary: remove Chapter_02_branch.md
+* a7e5abc Summary: update Chapter_02_branch.md
+* 80d1cf2 Summary: add Chapter_02_branch.md
+*   e07e4ca (origin/tmp, origin/dev, tmp, test, dev) Merge branch 'master' of github.com:neo1949/GitTest
+|\  
+| * a5d6af0 Summary: update Chapter_01_init.md
+* | 2d9c922 Summary: update Chapter_01_init.md
+|/  
+*   bb3fb11 Merge branch 'master' of github.com:neo1949/GitTest
+|\  
+| * c11ceb1 Summary: update Chapter_01_init.md
+* | b9c24d5 Summary: update Chapter_01_init.md
+|/  
+*   c349273 Merge branch 'master' of github.com:neo1949/GitTest
+|\  
+| * 75b684b (tag: v0.1) Update README.md
+* | 0b90633 Summary: create a git repo
+|/  
+* 0adb202 Initial commit
+```
+
+### 合并分支
+分支的合并请仔细阅读 [分支的创建与合并](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6) 章节中“分支的合并”的部分，主要记住合并分支的命令是 <code>git merge branch-name</code>。关于如何解决合并时的冲突，文档里面提供详细了的介绍，请仔细阅读。
+
+下面我们将在本地模拟合并分支冲突的情形：
+
+1.首先在主分支 <code>master</code> 创建一个空文件 "merge_conflict_test.md"，然后将其提交到远程仓库 <code>master</code> 分支上：
+```
+$ git add merge_conflict_test.md
+$ git commit -m "Add merge_conflict_test.md file for test"
+$ git push origin master
+```
+
+2.在本地创建一个 <code>merge_demo</code> 并切换到该分支：
+```
+git checkout -b merge_demo
+```
+
+3.打开 "merge_conflict_test.md" 文件，在第一行添加一句话：
+> This line was added on merge_demo branch.
+
+4.将文件提交到仓库后切换回主分支：
+```
+$ git add merge_conflict_test.md
+$ git commit -m "Add a line in merge_conflict_test.md on merge_demo branch"
+$ git checkout master
+```
+此时查看 "merge_conflict_test.md" 文件，可以看到我们刚才添加的那行内容不见了。这是必然的，因为我们的修改是在 <code>merge_demo</code> 分支上进行的。
+
+5.接下来再次在 "merge_conflict_test.md" 文件的第一行添加一句话：
+> This line was added on master branch.
+
+按照上面同样的方式将文件提交到仓库中：
+```
+$ git add merge_conflict_test.md
+$ git commit -m "Add a line in merge_conflict_test.md on master branch"
+```
+
+6.下面将 <code>merge_demo</code> 合并到 <code>master</code> 分支中：
+```
+$ git merge merge_demo
+Auto-merging merge_conflict_test.md
+CONFLICT (content): Merge conflict in merge_conflict_test.md
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+可以看到 Git 提示我们合并分支发生了冲突，需要我们解决冲突后提交结果。
+
+7.查看此时文件 "merge_conflict_test.md" 的内容如下：
+```
+$ cat merge_conflict_test.md
+<<<<<<< HEAD
+This line was added on master branch.
+=======
+This line was added on merge_demo branch.
+>>>>>>> merge_demo
+```
+
+这表示 <code>HEAD</code> 所指示的版本（也就是 <code>master</code> 分支所在的位置）在这个区段的上半部分（<code>=======</code> 的上半部分），而 <code>merge_demo</code> 分支所指示的版本在 <code>=======</code> 的下半部分。根据实际情况来确定需要删除和保留哪些内容。
+
+8.解决冲突后再次将文件提交到仓库：
+```
+$ cat merge_conflict_test.md
+This line was added on master branch.
+This line was added on merge_demo branch.
+This line was added to show how fixing conflict.
+$ git status
+On branch master
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+
+	both modified:   merge_conflict_test.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+$ git add merge_conflict_test.md
+$ git commit
+```
+
+使用 <code>git commit</code> 提交时可以看到系统自动添加了哪个文件发生了合并冲突的提交说明：
+```
+Merge branch 'merge_demo'
+
+# Conflicts:
+#	merge_conflict_test.md
+# ...
+```
+
+通过这个例子可以看到，如果在两个不同的分支中，对同一个文件的同一个部分进行了不同的修改，Git 就没法干净的合并它们从而导致合并冲突。
+
+现在我们应该已经学会如何解决合并冲突的问题了！
+
+### 将本地分支推送远程仓库
 ```
 git push origin branch-name
 ```
@@ -385,7 +522,7 @@ git push origin branch-name
 git branch -d branch-name
 ```
 
-2.强制删除本地分支
+2.强制删除本地分支（忽略冲突）
 ```
 git branch -D branch-name
 ```
@@ -403,6 +540,41 @@ git push origin :branch-name
 ```
 这种方式也可以删除远程仓库里的分支，但是是否会保留数据未知，所以如果误删除了某个分支，可能无法恢复数据，为了安全起见，不推荐使用此种方式删除远程分支。
 
+删除远程仓库分支之后，使用 <code>git branch -a</code> 查看分支信息，发现刚才删除的远程分支依然能看到，可以使用 <code>git remote prune origin</code> 命令后再查看分支信息，不会再显示已删除的远程分支。
+
+下面完整地演示如何将一个 <code>dev</code> 分支添加到远程仓库后再删除的流程：
+```
+$ git branch -a
+* master
+  remotes/origin/master
+  remotes/origin/tmp
+$ git branch dev
+$ git push origin dev
+Total 0 (delta 0), reused 0 (delta 0)
+To git@github.com:neo1949/GitTest.git
+ * [new branch]      dev -> dev
+$ git branch -a
+  dev
+* master
+  remotes/origin/dev
+  remotes/origin/master
+  remotes/origin/tmp
+$ git push origin --delete dev
+To git@github.com:neo1949/GitTest.git
+ - [deleted]         dev
+$ git branch -a
+  dev
+* master
+  remotes/origin/dev
+  remotes/origin/master
+  remotes/origin/tmp
+$ git remote prune origin
+$ git branch -a
+  dev
+* master
+  remotes/origin/master
+  remotes/origin/tmp
+```
 
 ## 参考文章
 [Git 官方中文手册](https://git-scm.com/book/zh/v2)
