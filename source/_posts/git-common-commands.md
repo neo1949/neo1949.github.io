@@ -383,13 +383,46 @@ c349273 Merge branch 'master' of github.com:neo1949/GitTest
 ```
 可以看到 <code>master</code> 分支指向 <code>aed99ae</code> 开头的提交对象，而 <code>tmp</code> 和 <code>dev</code> 分支则指向 <code>e07e4ca</code> 开头的提交对象。
 
-### 切换分支
-切换到指定分支：
+### 分支管理
+#### 查看分支
+1.查看所有本地分支
+```
+git branch
+```
+<code>*</code> 表示当前所在的分支（也就是 <code>HEAD</code> 指针指向的分支）。
+
+2.查看所有分支
+```
+git branch -a
+```
+
+3.查看所有远程分支
+```
+git branch -r
+```
+
+4.查看每个分支的最后一次提交
+```
+git branch -v
+```
+
+5.查看已经合并到当前分支的分支
+```
+git branch --merged
+```
+
+6.查看未合并到当前分支的分支
+```
+git branch --no-merged
+```
+
+#### 切换分支
+1.切换到指定分支：
 ```
 git checkout branch-name
 ```
 
-创建分支并切换到新的分支：
+2.创建分支并切换到新的分支：
 ```
 git checkout -b new-branch
 ```
@@ -420,7 +453,7 @@ $ git log --decorate --oneline --graph --all
 * 0adb202 Initial commit
 ```
 
-### 合并分支
+#### 合并分支
 分支的合并请仔细阅读 [分支的创建与合并](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6) 章节中“分支的合并”的部分，主要记住合并分支的命令是 <code>git merge branch-name</code>。关于如何解决合并时的冲突，文档里面提供详细了的介绍，请仔细阅读。
 
 下面我们将在本地模拟合并分支冲突的情形：
@@ -513,12 +546,7 @@ Merge branch 'merge_demo'
 
 现在我们应该已经学会如何解决合并冲突的问题了！
 
-### 将本地分支推送远程仓库
-```
-git push origin branch-name
-```
-
-### 删除分支
+#### 删除分支
 1.删除本地分支
 ```
 git branch -d branch-name
@@ -577,6 +605,13 @@ $ git branch -a
   remotes/origin/master
   remotes/origin/tmp
 ```
+
+#### 将本地分支推送远程仓库
+```
+git push origin branch-name
+```
+
+### 远程分支
 
 ## 参考文章
 [Git 官方中文手册](https://git-scm.com/book/zh/v2)
