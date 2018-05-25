@@ -45,7 +45,7 @@ categories:
 [跳转到 “添加页内跳转（锚点链接）”](#add_anchor_in_page)
 ```
 
-<code>[]</code> 中的描述内容可以随意些，只要在 <code>#</code> 后面添加想要访问的锚点名称就行了。
+<code>[]</code> 中的描述内容可以随意写，只要在 <code>#</code> 后面添加想要访问的锚点名称就行了。
 
 ###  演示锚点
 
@@ -63,7 +63,6 @@ categories:
 点击 [我是标题4的锚点](#anchor_titie4) 跳转到“标题4”小章节。
 
 因为只是演示，所以不会看到明显的界面跳转。在实际使用时，如果要访问的锚点和访问点已经无法在电脑屏幕上同时显示，那么点击访问点可以看到界面会自动跳转到那些已经定义好的锚点。
-
 
 ### 差别
 从此页面 <code>hexo</code> 支持的博客渲染效果来看，<code>\[create an anchor\](#anchors-in-markdown)</code> 和 使用 <code>a</code> 标签创建的锚点，会在锚点的描述文字底部显示一条线 <code>---</code>，表示这是个链接。而使用 <code>div</code> 和 <code>span</code> 标签创建的锚点不会显示链接的标志。
