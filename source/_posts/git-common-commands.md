@@ -217,7 +217,7 @@ origin  git@github.com:neo1949/GitTest.git (fetch)
 origin  git@github.com:neo1949/GitTest.git (push)
 ```
 
-### 添加远程仓库
+### <span id="add_remote_git_repository">添加远程仓库</span>
 使用下面的命令添加一个新的远程 Git 仓库，同时指定一个你可以轻松引用的简写：
 ```
 git remote add <shortname> <url>
@@ -612,6 +612,65 @@ git push origin branch-name
 ```
 
 ### 远程分支
+远程引用是对远程仓库的引用（指针），包括分支、标签等等。可以通过 <code>git ls-remote (remote)</code> 来显式地获得远程引用的完整列表，或者通过之前介绍过的  <code>git remote show (remote)</code> 命令获得远程分支的更多信息。然而，一个更常见的做法是利用**远程跟踪分支**。
+
+远程跟踪分支是远程分支状态的引用。它们是你不能移动的本地引用，当你做任何网络通信操作时，它们会自动移动。远程跟踪分支像是你上次连接到远程仓库时，那些分支所处状态的书签。
+
+远程跟踪分支以 <code>(remote)/(branch)</code> 形式命名。
+
+需要再次明确一点：<code>origin</code> 并无特殊含义。远程仓库名字 <code>origin</code> 与分支名字 <code>master</code> 一样，在 Git 中并没有任何特别的含义。<code>master</code> 是运行 <code>git init</code> 时默认的起始分支名字，原因仅仅是它的广泛使用。<code>origin</code> 是运行 <code>git clone</code> 时默认的远程仓库名字。如果你运行 <code>git clone -o booyah</code>，那么你默认的远程分支名字将会是 <code>booyah/master</code>。
+
+演示：
+```
+$ git clone -o work git@github.com:neo1949/GitTest.git GitTest2
+$ cd GitTest2
+$ git branch -a
+* master
+  remotes/work/HEAD -> work/master
+  remotes/work/master
+  remotes/work/tmp
+$ git remote show work
+* remote work
+  Fetch URL: git@github.com:neo1949/GitTest.git
+  Push  URL: git@github.com:neo1949/GitTest.git
+  HEAD branch: master
+  Remote branches:
+    master tracked
+    tmp    tracked
+  Local branch configured for 'git pull':
+    master merges with remote master
+  Local ref configured for 'git push':
+    master pushes to master (up to date)
+```
+
+综合前面介绍过的命令，可以看到 <code>git clone -o remote-name</code> 实际上相当于做了如下一系列操作：
+```
+$ mkdir GitTest2
+$ cd GitTest2
+$ git init
+$ git remote add work git@github.com:neo1949/GitTest.git
+$ git fetch work
+$ git checkout master
+$ git branch -a
+* master
+  remotes/work/master
+  remotes/work/tmp
+$ git remote show work
+* remote work
+  Fetch URL: git@github.com:neo1949/GitTest.git
+  Push  URL: git@github.com:neo1949/GitTest.git
+  HEAD branch: master
+  Remote branches:
+    master tracked
+    tmp    tracked
+```
+
+一个完整的克隆现有仓库的命令：
+```
+git clone [-o shortname] url [local-repo-name]
+```
+- shortname : 使用 <code>shortname</code> 代替默认的 <code>origin</code> 远程仓库名称
+- local-repo-name : 克隆仓库到 <code>local-repo-name</code> 文件夹中
 
 ## 参考文章
 [Git 官方中文手册](https://git-scm.com/book/zh/v2)
