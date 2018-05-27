@@ -78,7 +78,7 @@ Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地�
 git init
 ```
 
-### 克隆现有的仓库
+### <sapn id="clone_an_existing_repository">克隆现有的仓库</span>
 ```
 git clone url [local-repo-name]
 ```
@@ -264,7 +264,7 @@ $ git remote show origin
 ```
 这些信息非常有用，它告诉你正处于 <code>master</code> 分支，并且如果运行 <code>git pull</code>，就会抓取所有的远程引用，然后将远程 <code>master</code> 分支合并到本地 <code>master</code> 分支。它也会列出拉取到的所有远程引用。
 
-4.重命名远程仓库
+4.<span id="rename_remote_repository">重命名远程仓库</span>
 ```
 git remote rename old-remote-name new-remote-name
 ```
@@ -557,7 +557,7 @@ git branch -d branch-name
 git branch -D branch-name
 ```
 
-3.删除远程仓库的分支
+3.<span id="delete_remote_branch">删除远程仓库的分支</span>
 ```
 git push origin --delete branch-name
 ```
@@ -606,19 +606,14 @@ $ git branch -a
   remotes/origin/tmp
 ```
 
-#### 将本地分支推送远程仓库
-```
-git push origin branch-name
-```
+#### 远程分支
+远程分支的概念请先阅读 [远程分支](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF)。以下为个人摘录总结，可能存在理解错误。
 
-### 远程分支
-远程引用是对远程仓库的引用（指针），包括分支、标签等等。可以通过 <code>git ls-remote (remote)</code> 来显式地获得远程引用的完整列表，或者通过之前介绍过的  <code>git remote show (remote)</code> 命令获得远程分支的更多信息。然而，一个更常见的做法是利用**远程跟踪分支**。
+远程引用是对远程仓库的引用（指针），包括分支、标签等等。可以通过 <code>git ls-remote (remote)</code> 来显式地获得远程引用的完整列表，或者通过之前介绍过的  <code>git remote show (remote)</code> 命令获得远程分支的更多信息。通常更常见的做法是利用**远程跟踪分支**。
 
-远程跟踪分支是远程分支状态的引用。它们是你不能移动的本地引用，当你做任何网络通信操作时，它们会自动移动。远程跟踪分支像是你上次连接到远程仓库时，那些分支所处状态的书签。
+远程跟踪分支是远程分支状态的引用，以 <code>(remote)/(branch)</code> 形式命名。你不能移动这些本地引用，当你做任何网络通信操作时，它们会自动移动。远程跟踪分支像是你上次连接到远程仓库时，那些分支所处状态的书签。使用 <code>git clone</code> 命令克隆仓库时，系统会自动将其命名为 <code>origin</code>，拉取它的所有数据，创建一个指它的 <code>master</code> 分支的指针，并且在本地将其命名为 <code>origin/master</code>。同时，Git 会在本地创建一个与 <code>origin</code> 的 <code>master</code> 指向同一个地方的 <code>master</code> 分支，这样可以方便你开展工作。
 
-远程跟踪分支以 <code>(remote)/(branch)</code> 形式命名。
-
-需要再次明确一点：<code>origin</code> 并无特殊含义。远程仓库名字 <code>origin</code> 与分支名字 <code>master</code> 一样，在 Git 中并没有任何特别的含义。<code>master</code> 是运行 <code>git init</code> 时默认的起始分支名字，原因仅仅是它的广泛使用。<code>origin</code> 是运行 <code>git clone</code> 时默认的远程仓库名字。如果你运行 <code>git clone -o booyah</code>，那么你默认的远程分支名字将会是 <code>booyah/master</code>。
+需要再次明确一点：<code>origin</code> 并无特殊含义。远程仓库名字 <code>origin</code> 与分支名字 <code>master</code> 一样，在 Git 中并没有任何特别的含义。<code>master</code> 是运行 <code>git init</code> 时默认的起始分支名字，原因仅仅是它的广泛使用。<code>origin</code> 是运行 <code>git clone</code> 时默认的远程仓库名字，如果你运行 <code>git clone -o booyah</code>，那么你默认的远程跟踪分支名字将会是 <code>booyah/master</code>。
 
 演示：
 ```
@@ -629,48 +624,36 @@ $ git branch -a
   remotes/work/HEAD -> work/master
   remotes/work/master
   remotes/work/tmp
-$ git remote show work
-* remote work
-  Fetch URL: git@github.com:neo1949/GitTest.git
-  Push  URL: git@github.com:neo1949/GitTest.git
-  HEAD branch: master
-  Remote branches:
-    master tracked
-    tmp    tracked
-  Local branch configured for 'git pull':
-    master merges with remote master
-  Local ref configured for 'git push':
-    master pushes to master (up to date)
 ```
 
-综合前面介绍过的命令，可以看到 <code>git clone -o remote-name</code> 实际上相当于做了如下一系列操作：
+可以看到 <code>git clone -o remote-name</code> 实际上相当于先执行了 [克隆仓库](#clone_an_existing_repository) 的命令，然后又执行了 [重命名仓库](#rename_remote_repository) 的操作：
 ```
-$ mkdir GitTest2
+$ git clone git@github.com:neo1949/GitTest.git GitTest2
 $ cd GitTest2
-$ git init
-$ git remote add work git@github.com:neo1949/GitTest.git
-$ git fetch work
-$ git checkout master
 $ git branch -a
 * master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/tmp
+$ git remote rename origin work
+$ git branch -a
+* master
+  remotes/work/HEAD -> work/master
   remotes/work/master
   remotes/work/tmp
-$ git remote show work
-* remote work
-  Fetch URL: git@github.com:neo1949/GitTest.git
-  Push  URL: git@github.com:neo1949/GitTest.git
-  HEAD branch: master
-  Remote branches:
-    master tracked
-    tmp    tracked
 ```
 
-一个完整的克隆现有仓库的命令：
+所以，完整的克隆仓库命令如下：
 ```
 git clone [-o shortname] url [local-repo-name]
 ```
-- shortname : 使用 <code>shortname</code> 代替默认的 <code>origin</code> 远程仓库名称
-- local-repo-name : 克隆仓库到 <code>local-repo-name</code> 文件夹中
+- shortname ：使用 <code>shortname</code> 作为远程仓库名，不指定该参数时使用 <code>origin</code> 作为远程仓库名
+- local-repo-name ：使用 <code>local-repo-name</code> 作为工作目录名称，不指定该参数时使用远程仓库名创建工作目录
+
+##### 将本地分支推送远程仓库
+```
+git push origin branch-name
+```
 
 ## 参考文章
 [Git 官方中文手册](https://git-scm.com/book/zh/v2)
