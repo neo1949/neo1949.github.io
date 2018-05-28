@@ -459,7 +459,7 @@ $ git log --decorate --oneline --graph --all
 * 0adb202 Initial commit
 ```
 
-### 合并分支
+### <span id="merge_branches">合并分支</span>
 分支的合并请仔细阅读 [分支的创建与合并](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6) 章节中“分支的合并”部分，主要记住合并分支的命令是 <code>git merge branch-name</code>。关于如何解决合并时的冲突，文档里面提供详细了的介绍，请仔细阅读。
 
 下面我们将在本地模拟合并分支冲突的情形：
@@ -766,6 +766,76 @@ $ git branch -vv
 使用 <code>git fetch</code> 命令从服务器上抓取本地没有的数据时，它并不会修改工作目录中的内容，它只会获取数据然后让你自己合并。然而，有一个命令叫作 <code>git pull</code>， 在大多数情况下它的含义是一个 <code>git fetch</code> 紧接着一个 <code>git merge</code> 命令。如果你像之前章节中演示的那样设置好了一个跟踪分支，不管它是显式地设置还是通过 <code>clone</code> 或 <code>checkout</code> 命令创建的，<code>git pull</code> 都会查找当前分支所跟踪的服务器与分支，从服务器上抓取数据然后尝试合并入那个远程分支。
 
 由于 <code>git pull</code> 的魔法经常令人困惑，所以通常单独显式地使用 <code>fetch</code> 与 <code>merge</code> 命令会更好一些。
+
+### 变基
+在 Git 中整合来自不同分支的修改主要有两种方法：<code>merge</code> 以及 <code>rebase</code>。关于 <code>merge</code> 以及 <code>rebase</code> 命令的原理请参考文档 [变基](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%8F%98%E5%9F%BA)。我们已经在前面 [合并分支](#merge_branches) 章节介绍过了如何使用 <code>merge</code> 命令，现在开始介绍如何使用 <code>rebase</code> 命令。还是以实例操作来演示，这样方便直观，便于理解和学习。
+
+1.首先切换到 <code>master</code> 分支，在 <code>log.md</code> 文件上添加一行说明性文字，然后将修改提交到仓库中：
+```
+$ git checkout master
+$ git add log.md
+$ git commit -m "Generate a commit log in repository for 'git rebase' test"
+$ git push origin master
+$ git log --oneline -2
+13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+2617b13 Merge branch 'test'
+```
+稍后我们将以 <code>13f83a3</code> 为节点来演示 <code>rebase</code> 操作。
+
+2.新建一个 <code>rebase_demo</code> 分支，切换到该分支后按照如下步骤操作：
+```
+$ git checkout -b rebase_demo
+$ touch rebase_on_rebase_demo.md
+$ git add rebase_on_rebase_demo.md
+$ git commit -m "Add rebase_on_rebase_demo.md file on rebase_demo branch"
+$ git log --oneline -2
+176ec79 Add rebase_on_rebase_demo.md file on rebase_demo branch
+13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+```
+现在我们在 <code>rebase_demo</code> 分支上有了一个 <code>176ec79</code> 提交。
+
+3.切回 <code>master</code> 分支，按如下步骤操作：
+```
+$ git checkout master
+$ touch rebase_on_master.md
+$ git add rebase_on_master.md
+$ git commit -m "Add rebase_on_master.md file in master branch"
+$ git log --oneline -2
+6340e0d Add rebase_on_master.md file in master branch
+13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+```
+现在我们在 <code>master</code> 分支上有了一个 <code>6340e0d</code> 提交。
+
+我们知道 <code>176ec79</code> 和 <code>6340e0d</code> 的共同祖先是 <code>13f83a3</code>。
+
+使用 <code>merge</code> 命令将 <code>rebase_demo</code> 分支上的修改合并到 <code>master</code> 分支时，Git 会对 <code>176ec79</code> 、<code>6340e0d</code> 以及  <code>13f83a3</code> 进行三方合并，生成一个新的快照（并提交）。除了通过合并整合分叉的历史，还有一种方法就是使用 <code>rebase</code> 命令。方法如下：首先提取在 <code>176ec79</code> 中引入的补丁和修改，然后在 <code>6340e0d</code> 的基础上应用一次。 在 Git 中，这种操作就叫做 **变基**。你可以使用 <code>rebase</code> 命令将提交到某一分支上的所有修改都移至另一分支上，就好像“重新播放”一样。命令操作如下：
+```
+$ git checkout rebase_demo
+$ git rebase master
+First, rewinding head to replay your work on top of it...
+Applying: Add rebase_on_rebase_demo.md file on rebase_demo branch
+```
+
+它的原理是首先找到这两个分支（即当前分支 <code>rebase_demo</code>、变基操作的目标基底分支 <code>master</code>）的最近共同祖先 <code>13f83a3</code>，然后对比当前分支相对于该祖先的历次提交，提取相应的修改并存为临时文件，然后将当前分支指向目标基底 <code>6340e0d</code>，最后以此将之前另存为临时文件的修改依序应用。
+
+现在回到 <code>master</code> 分支进行一次快进合并：
+```
+$ git checkout master
+$ git merge rebase_demo
+$ git log --oneline --graph -3
+* 827ff4b Add rebase_on_rebase_demo.md file on rebase_demo branch
+* 6340e0d Add rebase_on_master.md file in master branch
+* 13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+```
+
+此时，<code>827ff4b</code> 指向的快照就和使用 <code>merge</code> 命令最终生成的快照一模一样了。***这两种整合方法的最终结果没有任何区别，但是变基使得提交历史更加整洁。***上面我们用命令查看经过变基的分支的历史记录时会发现，尽管实际的开发工作是并行的，但它们看上去就像是串行的一样，提交历史是一条直线没有分叉。
+
+一般我们这样做的目的是为了确保在向远程分支推送时能保持提交历史的整洁——例如向某个其他人维护的项目贡献代码时。在这种情况下，你首先在自己的分支里进行开发，当开发完成时你需要先将你的代码变基到 <code>origin/master</code> 上，然后再向主项目提交修改。这样的话，该项目的维护者就不再需要进行整合工作，只需要快进合并便可。
+
+请注意，无论是通过变基，还是通过三方合并，整合的最终结果所指向的快照始终是一样的，只不过提交历史不同罢了。变基是将一系列提交按照原有次序依次应用到另一分支上，而合并是把最终结果合在一起。
+
+关于变基的一些更高级的操作请阅读 [变基](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%8F%98%E5%9F%BA) 中更有趣的例子。必须记住，使用变基必须要准守一条准则：**不要对在你的仓库外有副本的分支执行变基**。如果你遵循这条金科玉律，就不会出差错。否则，人民群众会仇恨你，你的朋友和家人也会嘲笑你，唾弃你。
+
 
 ## 参考文章
 [Git 官方中文手册](https://git-scm.com/book/zh/v2)
