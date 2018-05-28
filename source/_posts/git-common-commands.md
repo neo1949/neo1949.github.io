@@ -78,7 +78,7 @@ Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地�
 git init
 ```
 
-### 克隆现有的仓库
+### <sapn id="clone_an_existing_repository">克隆现有的仓库</span>
 ```
 git clone url [local-repo-name]
 ```
@@ -264,7 +264,7 @@ $ git remote show origin
 ```
 这些信息非常有用，它告诉你正处于 <code>master</code> 分支，并且如果运行 <code>git pull</code>，就会抓取所有的远程引用，然后将远程 <code>master</code> 分支合并到本地 <code>master</code> 分支。它也会列出拉取到的所有远程引用。
 
-4.重命名远程仓库
+4.<span id="rename_remote_repository">重命名远程仓库</span>
 ```
 git remote rename old-remote-name new-remote-name
 ```
@@ -547,7 +547,7 @@ Merge branch 'merge_demo'
 现在我们应该已经学会如何解决合并冲突的问题了！
 
 #### 删除分支
-1.删除本地分支
+1.<span id="delete_local_branch">删除本地分支</span>
 ```
 git branch -d branch-name
 ```
@@ -557,7 +557,7 @@ git branch -d branch-name
 git branch -D branch-name
 ```
 
-3.删除远程仓库的分支
+3.<span id="delete_remote_branch">删除远程仓库的分支</span>
 ```
 git push origin --delete branch-name
 ```
@@ -606,19 +606,14 @@ $ git branch -a
   remotes/origin/tmp
 ```
 
-#### 将本地分支推送远程仓库
-```
-git push origin branch-name
-```
+#### 远程分支
+远程分支的概念请先阅读 [远程分支](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF)。以下为个人摘录总结，可能存在理解错误。
 
-### 远程分支
-远程引用是对远程仓库的引用（指针），包括分支、标签等等。可以通过 <code>git ls-remote (remote)</code> 来显式地获得远程引用的完整列表，或者通过之前介绍过的  <code>git remote show (remote)</code> 命令获得远程分支的更多信息。然而，一个更常见的做法是利用**远程跟踪分支**。
+远程引用是对远程仓库的引用（指针），包括分支、标签等等。可以通过 <code>git ls-remote (remote)</code> 来显式地获得远程引用的完整列表，或者通过之前介绍过的  <code>git remote show (remote)</code> 命令获得远程分支的更多信息。通常更常见的做法是利用**远程跟踪分支**。
 
-远程跟踪分支是远程分支状态的引用。它们是你不能移动的本地引用，当你做任何网络通信操作时，它们会自动移动。远程跟踪分支像是你上次连接到远程仓库时，那些分支所处状态的书签。
+远程跟踪分支是远程分支状态的引用，以 <code>(remote)/(branch)</code> 形式命名。你不能移动这些本地引用，当你做任何网络通信操作时，它们会自动移动。远程跟踪分支像是你上次连接到远程仓库时，那些分支所处状态的书签。使用 <code>git clone</code> 命令克隆仓库时，系统会自动将其命名为 <code>origin</code>，拉取它的所有数据，创建一个指它的 <code>master</code> 分支的指针，并且在本地将其命名为 <code>origin/master</code>。同时，Git 会在本地创建一个与 <code>origin</code> 的 <code>master</code> 指向同一个地方的 <code>master</code> 分支，这样可以方便你开展工作。
 
-远程跟踪分支以 <code>(remote)/(branch)</code> 形式命名。
-
-需要再次明确一点：<code>origin</code> 并无特殊含义。远程仓库名字 <code>origin</code> 与分支名字 <code>master</code> 一样，在 Git 中并没有任何特别的含义。<code>master</code> 是运行 <code>git init</code> 时默认的起始分支名字，原因仅仅是它的广泛使用。<code>origin</code> 是运行 <code>git clone</code> 时默认的远程仓库名字。如果你运行 <code>git clone -o booyah</code>，那么你默认的远程分支名字将会是 <code>booyah/master</code>。
+需要再次明确一点：<code>origin</code> 并无特殊含义。远程仓库名字 <code>origin</code> 与分支名字 <code>master</code> 一样，在 Git 中并没有任何特别的含义。<code>master</code> 是运行 <code>git init</code> 时默认的起始分支名字，原因仅仅是它的广泛使用。<code>origin</code> 是运行 <code>git clone</code> 时默认的远程仓库名字，如果你运行 <code>git clone -o booyah</code>，那么你默认的远程跟踪分支名字将会是 <code>booyah/master</code>。
 
 演示：
 ```
@@ -629,48 +624,142 @@ $ git branch -a
   remotes/work/HEAD -> work/master
   remotes/work/master
   remotes/work/tmp
-$ git remote show work
-* remote work
-  Fetch URL: git@github.com:neo1949/GitTest.git
-  Push  URL: git@github.com:neo1949/GitTest.git
-  HEAD branch: master
-  Remote branches:
-    master tracked
-    tmp    tracked
-  Local branch configured for 'git pull':
-    master merges with remote master
-  Local ref configured for 'git push':
-    master pushes to master (up to date)
 ```
 
-综合前面介绍过的命令，可以看到 <code>git clone -o remote-name</code> 实际上相当于做了如下一系列操作：
+可以看到 <code>git clone -o remote-name</code> 实际上相当于先执行了 [克隆仓库](#clone_an_existing_repository) 的命令，然后又执行了 [重命名仓库](#rename_remote_repository) 的操作：
 ```
-$ mkdir GitTest2
+$ git clone git@github.com:neo1949/GitTest.git GitTest2
 $ cd GitTest2
-$ git init
-$ git remote add work git@github.com:neo1949/GitTest.git
-$ git fetch work
-$ git checkout master
 $ git branch -a
 * master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/tmp
+$ git remote rename origin work
+$ git branch -a
+* master
+  remotes/work/HEAD -> work/master
   remotes/work/master
   remotes/work/tmp
-$ git remote show work
-* remote work
-  Fetch URL: git@github.com:neo1949/GitTest.git
-  Push  URL: git@github.com:neo1949/GitTest.git
-  HEAD branch: master
-  Remote branches:
-    master tracked
-    tmp    tracked
 ```
 
-一个完整的克隆现有仓库的命令：
+所以，完整的克隆仓库命令如下：
 ```
 git clone [-o shortname] url [local-repo-name]
 ```
-- shortname : 使用 <code>shortname</code> 代替默认的 <code>origin</code> 远程仓库名称
-- local-repo-name : 克隆仓库到 <code>local-repo-name</code> 文件夹中
+- shortname ：使用 <code>shortname</code> 作为远程仓库名，不指定该参数时使用 <code>origin</code> 作为远程仓库名
+- local-repo-name ：使用 <code>local-repo-name</code> 作为工作目录名称，不指定该参数时使用远程仓库名创建工作目录
+
+##### 将本地分支推送远程仓库
+```
+git push remote-name branch-name[:remote-branch-name]
+```
+
+想要把一个分支推送到远程仓库上，必须要有这个仓库的写入权限。使用 <code>git push remote-name branch-name</code> 将本地分支推送到远程仓库中，系统会在远程仓库中创建一个名为 <code>branch-name</code> 的分支。如果我们并不想让远程仓库上的分支叫做<code>branch-name</code>，而是想使用一个新的分支名，可以使用 <code>git push remote-name branch-name:remote-branch-name</code> 的方式将本地 <code>branch-name</code> 分支推送到远程仓库上的 <code>remote-branch-name</code> 分支。
+
+示例：
+```
+$ git branch local-dev
+$ git push origin local-dev
+$ git branch -a
+local-dev
+* master
+remotes/origin/HEAD -> origin/master
+remotes/origin/dev
+remotes/origin/local-dev
+remotes/origin/master
+remotes/origin/team
+remotes/origin/test
+remotes/origin/tmp
+```
+可以看到远程仓库中多了一个 <code>local-dev</code> 分支。
+
+```
+$ git branch local-cache
+$ git push origin local-cache:origin-cache
+$ git branch -a
+local-cache
+local-dev
+* master
+remotes/origin/HEAD -> origin/master
+remotes/origin/dev
+remotes/origin/local-dev
+remotes/origin/master
+remotes/origin/remote-cache
+remotes/origin/team
+remotes/origin/test
+remotes/origin/tmp
+```
+可以看到远程仓库多了一个 <code>remote-cache</code> 分支。
+
+##### 删除远程分支
+[删除远程分支](#delete_remote_branch) 和 [删除本地分支](#delete_local_branch) 的命令在前面已经介绍过了，现在我们来删除刚才用于演示的 <code>local-dev</code> 和 <code>local-cache</code> 本地分支，以及它们对应的远程仓库中的分支：
+```
+$ git branch -d local-dev
+$ git push origin --delete local-dev
+$ git branch -d local-cache
+$ git push origin --delete remote-cach
+$ git branch -a
+* master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/dev
+  remotes/origin/master
+  remotes/origin/team
+  remotes/origin/test
+  remotes/origin/tmp
+```
+可以看到远程库中的 <code>local-dev</code> 和 <code>remote-cache</code> 分支都被删除掉了。
+
+##### 跟踪分支
+从一个远程跟踪分支检出一个本地分支会自动创建一个叫做 “跟踪分支”（有时候也叫做 “上游分支”）。跟踪分支是与远程分支有直接关系的本地分支。如果在一个跟踪分支上输入 <code>git pull</code>，Git 能自动地识别去哪个服务器上抓取、合并到哪个分支。
+
+前面我们已经知道，当克隆一个仓库时，它会自动地创建一个跟踪 <code>origin/master</code> 的 <code>master</code> 分支。然而，如果你愿意的话可以设置其他的跟踪分支 - 其他远程仓库上的跟踪分支，或者不跟踪 <code>master</code> 分支。
+
+假设有个小组的管理人员在本地创建了 <code>team</code> 分支并将其推送了远仓库，现在指定小组内的所有人都要在这个 <code>team</code> 分支上进行工作。当管理人员将 <code>team</code> 分支推送到远程仓库后，其他人通过 <code>git fetch</code> 从服务器上抓取数据时，他们会在本地生成一个 <code>origin/team</code> 远程分支，指向服务器中 <code>team</code> 分支的引用。
+
+需要特别注意是当抓取到新的远程跟踪分支时，本地并不会自动生成一份可编辑的副本（拷贝）。换句话说，系统不会在本地创建一个 <code>team</code> 分支，只有一个不可修改的 <code>origin/team</code> 指针。那么我们如何创建一个跟踪 <code>team</code> 分支的本地分支呢？有三种实现方式：
+
+1.第一种
+```
+$ git checkout --track origin/team
+Branch team set up to track remote branch team from origin.
+Switched to a new branch 'team'
+```
+
+2.第二种
+```
+$ git checkout -b team origin/team
+Branch team set up to track remote branch team from origin.
+Switched to a new branch 'team'
+```
+当然了，我们可以将本地分支与远程分支设置为不同的名字，只需要将 <code>team</code> 换成我们需要的名字即可，比如运行 <code>git checkout -b my-team origin/team</code>，现在 <code>my-team</code> 被设置为用来跟踪远程仓库中的 <code>team</code>，本地分支 <code>my-team</code> 会自动从 <code>origin/team</code> 拉取数据。
+
+3.第三种
+```
+$ git checkout -b team
+Switched to a new branch 'team'
+$ git branch -u origin/team
+Branch team set up to track remote branch team from origin.
+```
+我们可以先创建一个本地分支，然后切换到该分支后执行 <code>git branch -u remote-name/branch-name</code> 或者 <code>git branch -\-set-upstream-to remote-name/branch-name</code> 命令来显示地设置让当前本地分支追踪某个上游分支。通过这个命令我们还可以修改正在跟踪的上游分支。比如我们刚才让本地的 <code>team</code> 追踪上游的 <code>team</code>，现在我们在 <code>team</code> 分支上的所有工作都完成了并且合并到了主分支 <code>master</code> 上面，后续的工作基于 <code>master</code> 分支继续进行就可以了，那么我们现在就可以使用 <code>git branch -u origin/master</code> 让 <code>team</code> 追踪主分支 <code>master</code>，这样我们就可以在 <code>team</code> 分支上继续工作了。
+
+想要查看设置的所有跟踪分支，可以使用<code>git branch -vv</code> 命令。这会将所有的本地分支列出来并且包含更多的信息，如每一个分支正在跟踪哪个远程分支，本地分支是否是领先、落后或是都有。
+
+示例：
+```
+$ git branch -vv
+  dev    2617b13 [origin/dev] Merge branch 'test'
+  master 2617b13 [origin/master] Merge branch 'test'
+* team   2617b13 [origin/team: behind 1] Merge branch 'test'
+```
+可以看到 <code>dev</code> 分支正在跟踪 <code>origin/dev</code> 分支并且是最新的。也能看到 <code>master</code> 分支正在跟踪 <code>origin/master</code> 分支并且也是最新的。最后可以看到 <code>team</code> 分支正在跟踪 <code>origin/team</code> 分支并且落后1，意味着服务器上还有一次提交没有合并到本地。如果我们看到 <code>ahead x</code> 之类的提交信息，意味着本地有x次提交还没有推送到服务器上。
+
+需要注意的是这些数字的值只是来自于你从每个服务器上最后一次抓取的数据。这个命令并没有连接服务器，它只会告诉你关于本地缓存的服务器数据。如果想要统计最新的领先与落后数字，需要先运行 <code>git fetch -\-all</code> 命令后再运行查看跟踪分支的命令。
+
+##### 拉取数据
+使用 <code>git fetch</code> 命令从服务器上抓取本地没有的数据时，它并不会修改工作目录中的内容，它只会获取数据然后让你自己合并。然而，有一个命令叫作 <code>git pull</code>， 在大多数情况下它的含义是一个 <code>git fetch</code> 紧接着一个 <code>git merge</code> 命令。如果你像之前章节中演示的那样设置好了一个跟踪分支，不管它是显式地设置还是通过 <code>clone</code> 或 <code>checkout</code> 命令创建的，<code>git pull</code> 都会查找当前分支所跟踪的服务器与分支，从服务器上抓取数据然后尝试合并入那个远程分支。
+
+由于 <code>git pull</code> 的魔法经常令人困惑，所以通常单独显式地使用 <code>fetch</code> 与 <code>merge</code> 命令会更好一些。
 
 ## 参考文章
 [Git 官方中文手册](https://git-scm.com/book/zh/v2)
