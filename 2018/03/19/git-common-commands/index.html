@@ -88,8 +88,9 @@
 <meta property="og:description" content="首先建议大家阅读 官方文档，里面详细的介绍了 Git 的前世今生。官方文档基本提供了你需要的任何跟 Git 相关的东西，并且文档非常友好地提供了中文版。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://git-scm.com/book/en/v2/images/areas.png">
+<meta property="og:image" content="https://git-scm.com/book/en/v2/images/lifecycle.png">
 <meta property="og:image" content="http://p5ia12npj.bkt.clouddn.com/commit_object.png">
-<meta property="og:updated_time" content="2018-05-28T03:09:02.083Z">
+<meta property="og:updated_time" content="2018-05-28T07:03:31.606Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Git常用命令总结">
 <meta name="twitter:description" content="首先建议大家阅读 官方文档，里面详细的介绍了 Git 的前世今生。官方文档基本提供了你需要的任何跟 Git 相关的东西，并且文档非常友好地提供了中文版。">
@@ -351,25 +352,31 @@
 <h2 id="获取帮助的三种方式"><a href="#获取帮助的三种方式" class="headerlink" title="获取帮助的三种方式"></a>获取帮助的三种方式</h2><p>可以通过以下三种方法可以找到 Git 命令的使用手册：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git help &lt;verb&gt;</span><br><span class="line">git &lt;verb&gt; --help</span><br><span class="line">man git-&lt;verb&gt;</span><br></pre></td></tr></table></figure></p>
 <p>例如查看 config 命令的手册，执行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git help config</span><br></pre></td></tr></table></figure></p>
 <h2 id="Git-的三种状态"><a href="#Git-的三种状态" class="headerlink" title="Git 的三种状态"></a>Git 的三种状态</h2><p>在正式使用 Git 之前，需要了解 Git 中几个非常重要的概念。</p>
-<p>首先需要记住 Git 有三种状态，你的文件可能处于其中之一：已提交（committed）、已修改（modified）和已暂存（staged）。已提交表示数据已经安全的保存在本地数据库中。已修改表示修改了文件，但还没保存到数据库中。已暂存表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。</p>
+<p><a href="https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-Git-%E5%9F%BA%E7%A1%80" target="_blank" rel="noopener">Git 基础</a> 写到 “Git 有三种状态，你的文件可能处于其中之一：已提交 <code>committed</code>、已修改 <code>modified</code> 和已暂存<code>staged</code>”。实际上这段描述翻译地不是特别准确，英文原文是 “Git has three main states that your files can reside in: <em>committed</em>, <em>modified</em>, and <em>staged</em>“。原文实际上说的是 “你的文件在 Git 主要有三种状态：已提交 <code>committed</code>、已修改 <code>modified</code> 和已暂存 <code>staged</code>”，意思是主要有三种状态，而不是只有三种状态的意思。因为这可能给后面 Git 文件状态变化的理解造成误导，所以特地指出。</p>
+<p><code>committed</code> 表示数据已经安全的保存在本地数据库中。<code>modified</code> 表示修改了文件，但还没保存到数据库中。<code>staged</code> 表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。</p>
 <p>由此引入 Git 项目的三个工作区域的概念：Git 仓库、工作目录以及暂存区域。</p>
 <p><img src="https://git-scm.com/book/en/v2/images/areas.png" alt="工作目录、暂存区域以及 Git 仓库"></p>
-<p>Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地方。这是 Git 中最重要的部分，从其它计算机克隆仓库时，拷贝的就是这里的数据。</p>
-<p>工作目录是对项目的某个版本独立提取出来的内容。这些从 Git 仓库的压缩数据库中提取出来的文件，放在磁盘上供你使用或修改。</p>
-<p>暂存区域是一个文件，保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。有时候也被称作‘索引’，不过一般说法还是叫暂存区域。</p>
+<ul>
+<li>Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地方。这是 Git 中最重要的部分，从其它计算机克隆仓库时，拷贝的就是这里的数据。</li>
+<li>工作目录是对项目的某个版本独立提取出来的内容。这些从 Git 仓库的压缩数据库中提取出来的文件，放在磁盘上供你使用或修改。</li>
+<li>暂存区域是一个文件，保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。有时候也被称作‘索引’，不过一般说法还是叫暂存区域。</li>
+</ul>
 <p>基本的 Git 工作流程如下：</p>
 <ol>
 <li>在工作目录中修改文件。</li>
 <li>暂存文件，将文件的快照放入暂存区域。</li>
 <li>提交更新，找到暂存区域的文件，将快照永久性存储到 Git 仓库目录。</li>
 </ol>
-<p>如果 Git 目录中保存着的特定版本文件，就属于已提交状态。 如果作了修改并已放入暂存区域，就属于已暂存状态。 如果自上次取出后，作了修改但还没有放到暂存区域，就是已修改状态。</p>
-<p>在使用 Git 命令时，需要牢记 Git 的三种状态以及三个工作区域的概念。</p>
+<p>如果 Git 目录中保存着特定的版本文件，就属于已提交状态。如果作了修改并已放入暂存区域，就属于已暂存状态。如果自上次取出后，作了修改但还没有放到暂存区域，就是已修改状态。</p>
+<p>工作目录下的每一个文件都不外乎两种状态：已跟踪或未跟踪。已跟踪的文件是指那些被纳入了版本控制的文件，在上一次快照中有它们的记录，在工作一段时间后，它们的状态可能处于未修改，已修改或已放入暂存区。工作目录中除已跟踪文件以外的所有其它文件都属于未跟踪文件，它们既不存在于上次快照的记录中，也没有放入暂存区。初次克隆某个仓库的时候，工作目录中的所有文件都属于已跟踪文件，并处于未修改状态。下图是 Git 中文件的状态变化周期：</p>
+<p><img src="https://git-scm.com/book/en/v2/images/lifecycle.png" alt="文件的状态变化周期"></p>
+<p>在使用 Git 命令时，需要牢记文件状态以及工作区域的概念。</p>
 <h2 id="获取-Git-仓库"><a href="#获取-Git-仓库" class="headerlink" title="获取 Git 仓库"></a>获取 Git 仓库</h2><h3 id="创建一个新的仓库"><a href="#创建一个新的仓库" class="headerlink" title="创建一个新的仓库"></a>创建一个新的仓库</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br></pre></td></tr></table></figure>
 <h3 id="克隆现有的仓库"><a href="#克隆现有的仓库" class="headerlink" title="克隆现有的仓库"></a><sapn id="clone_an_existing_repository">克隆现有的仓库</sapn></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone url [local-repo-name]</span><br></pre></td></tr></table></figure>
-<p>不指定本地仓库 local-repo-name 名称时，系统会默认创建与远程仓库名称相同的文件夹并将仓库拷贝到文件夹中。</p>
+<p>不指定本地仓库 <code>local-repo-name</code> 名称时，系统会默认创建与远程仓库名称相同的文件夹并将仓库拷贝到文件夹中。</p>
 <h2 id="记录每次更新到仓库"><a href="#记录每次更新到仓库" class="headerlink" title="记录每次更新到仓库"></a>记录每次更新到仓库</h2><p>1.查看当前文件的状态<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br></pre></td></tr></table></figure></p>
 <p>2.跟踪新文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add filename</span><br></pre></td></tr></table></figure></p>
+<p>也可以使用 <code>git commit -A</code> 命令将所有文件添加到暂存区域。</p>
 <p>3.查看修改<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff [--cached] [filename]</span><br></pre></td></tr></table></figure></p>
 <p><code>git diff</code> 本身只显示尚未暂存的改动，而不是自上次提交以来所做的所有改动。如果不指定文件名称，默认会比较本地所有已跟踪但未暂存的修改。</p>
 <p>若要查看已暂存的将要添加到下次提交里的内容，可以用 <code>git diff --cached</code> 命令。（Git 1.6.1 及更高版本还允许使用 <code>git diff --staged</code>，效果相同但更好记些。）</p>
@@ -381,11 +388,11 @@
 <p>如果我们想要重命名文件或者将文件移动到另一个文件夹下面，可以使用此种方式。</p>
 <p>7.提交更新到本地仓库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit -m &quot;commit message&quot;</span><br></pre></td></tr></table></figure></p>
 <h2 id="Git-提交记录-git-log"><a href="#Git-提交记录-git-log" class="headerlink" title="Git 提交记录 - git log"></a>Git 提交记录 - git log</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log</span><br></pre></td></tr></table></figure>
-<p>按提交时间列出所有的更新，列出每个提交的 SHA-1 校验和、作者的名字和电子邮件地址、提交时间以及提交说明。</p>
+<p>按提交时间列出所有的更新，列出每个提交的 <code>SHA-1</code> 校验和、作者的名字和电子邮件地址、提交时间以及提交说明。</p>
 <p>1.显示指定文件所有的更新<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log filename</span><br></pre></td></tr></table></figure></p>
 <p>2.显示最近n次的提交记录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log -n</span><br></pre></td></tr></table></figure></p>
 <p>3.显示每次提交的内容差异<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log -p</span><br></pre></td></tr></table></figure></p>
-<p>以上参数可以混合使用。例如，查看 README 文件最近两次提交的内容差异：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log -p -2 README.md</span><br></pre></td></tr></table></figure></p>
+<p>以上参数可以混合使用。例如，查看 <code>README</code> 文件最近两次提交的内容差异：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log -p -2 README.md</span><br></pre></td></tr></table></figure></p>
 <p>4.查看每次提交的简略统计信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log --stat</span><br></pre></td></tr></table></figure></p>
 <p><code>--stat</code> 选项在每次提交的下面列出所有被修改过的文件、有多少文件被修改了以及被修改过的文件的哪些行被移除或是添加了。在每次提交的最后还有一个总结。</p>
 <p>5.使用 <code>--pretty=oneline</code> 将每个提交放在一行显示，查看的提交数很大时非常有用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git log --pretty=oneline</span><br></pre></td></tr></table></figure></p>
@@ -409,8 +416,9 @@
 <p>2.推送到远程分支<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push [remote-name] [branch-name]</span><br></pre></td></tr></table></figure></p>
 <p>当你想要将 <code>master</code> 分支推送到 <code>origin</code> 服务器时（再次说明，克隆时通常会自动帮你设置好那两个名字），那么运行这个命令就可以将你所做的备份到服务器：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git push origin master</span><br></pre></td></tr></table></figure></p>
 <p>3.查看远程仓库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote show [remote-name]</span><br></pre></td></tr></table></figure></p>
-<p>例如：查看远程分支 <code>origin</code> 的分支信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ git remote show origin</span><br><span class="line">* remote origin</span><br><span class="line">  Fetch URL: git@github.com:neo1949/GitTest.git</span><br><span class="line">  Push  URL: git@github.com:neo1949/GitTest.git</span><br><span class="line">  HEAD branch: master</span><br><span class="line">  Remote branches:</span><br><span class="line">    master tracked</span><br><span class="line">    tmp    tracked</span><br><span class="line">  Local branch configured for &apos;git pull&apos;:</span><br><span class="line">    master merges with remote master</span><br><span class="line">  Local ref configured for &apos;git push&apos;:</span><br><span class="line">    master pushes to master (up to date)</span><br></pre></td></tr></table></figure></p>
-<p>这些信息非常有用，它告诉你正处于 <code>master</code> 分支，并且如果运行 <code>git pull</code>，就会抓取所有的远程引用，然后将远程 <code>master</code> 分支合并到本地 <code>master</code> 分支。它也会列出拉取到的所有远程引用。</p>
+<p>例如：查看远程仓库 <code>origin</code> 的详细信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ git remote show origin</span><br><span class="line">* remote origin</span><br><span class="line">  Fetch URL: git@github.com:neo1949/GitTest.git</span><br><span class="line">  Push  URL: git@github.com:neo1949/GitTest.git</span><br><span class="line">  HEAD branch: master</span><br><span class="line">  Remote branches:</span><br><span class="line">    master tracked</span><br><span class="line">    tmp    tracked</span><br><span class="line">  Local branch configured for &apos;git pull&apos;:</span><br><span class="line">    master merges with remote master</span><br><span class="line">  Local ref configured for &apos;git push&apos;:</span><br><span class="line">    master pushes to master (up to date)</span><br></pre></td></tr></table></figure></p>
+<p>这些信息非常有用，它会列出远程仓库的 URL 与跟踪分支的信息。它会告诉你正处于哪个分支。比如本例中可以看到你当前处于 <code>master</code> 分支，如果你运行 <code>git pull</code> 命令，Git 就会自动抓取所有的远程引用，然后将远程 <code>master</code> 分支合并到本地 <code>master</code> 分支。它也会列出拉取到的所有远程引用。</p>
+<p>这个命令还会列出当你在特定的分支上执行 <code>git push</code> 命令式会自动地推送到哪一个远程分支。同时还会列出哪些远程分支不在你的本地，哪些远程分支已经从服务器上移除了，还有当你执行 <code>git pull</code> 时哪些分支会自动合并。</p>
 <p>4.<span id="rename_remote_repository">重命名远程仓库</span><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote rename old-remote-name new-remote-name</span><br></pre></td></tr></table></figure></p>
 <p>值得注意的是这同样也会修改你的远程分支名字。那些过去引用 <code>old-remote-name/master</code> 的现在会引用 <code>new-remote-name/master</code>。</p>
 <p>5.移除远程仓库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote rm remote-name</span><br></pre></td></tr></table></figure></p>
