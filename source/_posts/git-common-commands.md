@@ -51,26 +51,30 @@ git help config
 ## Git 的三种状态
 在正式使用 Git 之前，需要了解 Git 中几个非常重要的概念。
 
-首先需要记住 Git 有三种状态，你的文件可能处于其中之一：已提交（committed）、已修改（modified）和已暂存（staged）。已提交表示数据已经安全的保存在本地数据库中。已修改表示修改了文件，但还没保存到数据库中。已暂存表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。
+[Git 基础](https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-Git-%E5%9F%BA%E7%A1%80) 写到 “Git 有三种状态，你的文件可能处于其中之一：已提交 <code>committed</code>、已修改 <code>modified</code> 和已暂存<code>staged</code>”。实际上这段描述翻译地不是特别准确，英文原文是 "Git has three main states that your files can reside in: *committed*, *modified*, and *staged*"。原文实际上说的是 “你的文件在 Git 主要有三种状态：已提交 <code>committed</code>、已修改 <code>modified</code> 和已暂存 <code>staged</code>”，意思是主要有三种状态，而不是只有三种状态的意思。因为这可能给后面 Git 文件状态变化的理解造成误导，所以特地指出。
+
+<code>committed</code> 表示数据已经安全的保存在本地数据库中。<code>modified</code> 表示修改了文件，但还没保存到数据库中。<code>staged</code> 表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。
 
 由此引入 Git 项目的三个工作区域的概念：Git 仓库、工作目录以及暂存区域。
 
 ![工作目录、暂存区域以及 Git 仓库](https://git-scm.com/book/en/v2/images/areas.png)
 
-Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地方。这是 Git 中最重要的部分，从其它计算机克隆仓库时，拷贝的就是这里的数据。
-
-工作目录是对项目的某个版本独立提取出来的内容。这些从 Git 仓库的压缩数据库中提取出来的文件，放在磁盘上供你使用或修改。
-
-暂存区域是一个文件，保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。有时候也被称作‘索引’，不过一般说法还是叫暂存区域。
+- Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地方。这是 Git 中最重要的部分，从其它计算机克隆仓库时，拷贝的就是这里的数据。
+- 工作目录是对项目的某个版本独立提取出来的内容。这些从 Git 仓库的压缩数据库中提取出来的文件，放在磁盘上供你使用或修改。
+- 暂存区域是一个文件，保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。有时候也被称作‘索引’，不过一般说法还是叫暂存区域。
 
 基本的 Git 工作流程如下：
 1. 在工作目录中修改文件。
 2. 暂存文件，将文件的快照放入暂存区域。
 3. 提交更新，找到暂存区域的文件，将快照永久性存储到 Git 仓库目录。
 
-如果 Git 目录中保存着的特定版本文件，就属于已提交状态。 如果作了修改并已放入暂存区域，就属于已暂存状态。 如果自上次取出后，作了修改但还没有放到暂存区域，就是已修改状态。
+如果 Git 目录中保存着特定的版本文件，就属于已提交状态。如果作了修改并已放入暂存区域，就属于已暂存状态。如果自上次取出后，作了修改但还没有放到暂存区域，就是已修改状态。
 
-在使用 Git 命令时，需要牢记 Git 的三种状态以及三个工作区域的概念。
+工作目录下的每一个文件都不外乎两种状态：已跟踪或未跟踪。已跟踪的文件是指那些被纳入了版本控制的文件，在上一次快照中有它们的记录，在工作一段时间后，它们的状态可能处于未修改，已修改或已放入暂存区。工作目录中除已跟踪文件以外的所有其它文件都属于未跟踪文件，它们既不存在于上次快照的记录中，也没有放入暂存区。初次克隆某个仓库的时候，工作目录中的所有文件都属于已跟踪文件，并处于未修改状态。下图是 Git 中文件的状态变化周期：
+
+![文件的状态变化周期](https://git-scm.com/book/en/v2/images/lifecycle.png)
+
+在使用 Git 命令时，需要牢记文件状态以及工作区域的概念。
 
 ## 获取 Git 仓库
 ### 创建一个新的仓库
@@ -82,7 +86,7 @@ git init
 ```
 git clone url [local-repo-name]
 ```
-不指定本地仓库 local-repo-name 名称时，系统会默认创建与远程仓库名称相同的文件夹并将仓库拷贝到文件夹中。
+不指定本地仓库 <code>local-repo-name</code> 名称时，系统会默认创建与远程仓库名称相同的文件夹并将仓库拷贝到文件夹中。
 
 ##  记录每次更新到仓库
 1.查看当前文件的状态
@@ -94,6 +98,7 @@ git status
 ```
 git add filename
 ```
+也可以使用 <code>git commit -A</code> 命令将所有文件添加到暂存区域。
 
 3.查看修改
 ```
@@ -130,7 +135,7 @@ git commit -m "commit message"
 ```
 git log
 ```
-按提交时间列出所有的更新，列出每个提交的 SHA-1 校验和、作者的名字和电子邮件地址、提交时间以及提交说明。
+按提交时间列出所有的更新，列出每个提交的 <code>SHA-1</code> 校验和、作者的名字和电子邮件地址、提交时间以及提交说明。
 
 1.显示指定文件所有的更新
 ```
@@ -147,7 +152,7 @@ git log -n
 git log -p
 ```
 
-以上参数可以混合使用。例如，查看 README 文件最近两次提交的内容差异：
+以上参数可以混合使用。例如，查看 <code>README</code> 文件最近两次提交的内容差异：
 ```
 git log -p -2 README.md
 ```
@@ -247,7 +252,7 @@ $ git push origin master
 git remote show [remote-name]
 ```
 
-例如：查看远程分支 <code>origin</code> 的分支信息
+例如：查看远程仓库 <code>origin</code> 的详细信息
 ```
 $ git remote show origin
 * remote origin
@@ -262,7 +267,9 @@ $ git remote show origin
   Local ref configured for 'git push':
     master pushes to master (up to date)
 ```
-这些信息非常有用，它告诉你正处于 <code>master</code> 分支，并且如果运行 <code>git pull</code>，就会抓取所有的远程引用，然后将远程 <code>master</code> 分支合并到本地 <code>master</code> 分支。它也会列出拉取到的所有远程引用。
+这些信息非常有用，它会列出远程仓库的 URL 与跟踪分支的信息。它会告诉你正处于哪个分支。比如本例中可以看到你当前处于 <code>master</code> 分支，如果你运行 <code>git pull</code> 命令，Git 就会自动抓取所有的远程引用，然后将远程 <code>master</code> 分支合并到本地 <code>master</code> 分支。它也会列出拉取到的所有远程引用。
+
+这个命令还会列出当你在特定的分支上执行 <code>git push</code> 命令式会自动地推送到哪一个远程分支。同时还会列出哪些远程分支不在你的本地，哪些远程分支已经从服务器上移除了，还有当你执行 <code>git pull</code> 时哪些分支会自动合并。
 
 4.<span id="rename_remote_repository">重命名远程仓库</span>
 ```
