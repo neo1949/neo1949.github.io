@@ -35,6 +35,33 @@ git config --unset user.email
 ```
 再次查看配置信息，可以看到本地配置的用户名和邮箱已经被删除了，提交代码时会默认使用全局配置的用户名和邮箱。
 
+### 格式化与空白字符
+格式化和空白问题是许多开发人员在协作时遇到的一些更令人沮丧和微妙的问题，特别是跨平台问题。因为编辑器的原因，修补程序或其他协作工作很容易引入细微的空白变化，如果你的文件曾经触摸过 Windows 系统，那么它们的行尾可能会被替换掉。Git 提供了几个配置选项来帮助解决这些问题。
+
+#### <code>core.autocrlf</code>
+假如你正在 Windows 上写程序，而你的同伴用的是其他系统（或相反），你可能会遇到 CRLF 问题。 这是因为 Windows 使用回车（CR）和换行（LF）两个字符来结束一行，而 Mac 和 Linux 只使用换行（LF）一个字符。虽然这是小问题，但它会极大地扰乱跨平台协作。许多 Windows 上的编辑器会悄悄把行尾的换行字符转换成回车和换行，或在用户按下 Enter 键时，插入回车和换行两个字符。
+
+Git 可以在提交时自动地把回车和换行转换成换行，而在检出代码时把换行转换成回车和换行。你可以用 <code>core.autocrlf</code> 来打开此项功能。如果是在 Windows 系统上，把它设置成 <code>true</code>，这样在检出代码时，换行会被转换成回车和换行：
+```
+git config --global core.autocrlf true
+```
+
+如果使用以换行作为行结束符的 Linux 或 Mac，你不需要 Git 在检出文件时进行自动的转换；然而当一个以回车加换行作为行结束符的文件不小心被引入时，你肯定想让 Git 修正。 你可以把 <code>core.autocrlf</code> 设置成 <code>input</code> 来告诉 Git 在提交时把回车和换行转换成换行，检出时不转换：
+```
+git config --global core.autocrlf input
+```
+这样在 Windows 上的检出文件中会保留回车和换行，而在 Mac 和 Linux 上，以及版本库中会保留换行。
+
+
+如果你是 Windows 程序员，且正在开发仅运行在 Windows 上的项目，可以设置 <code>false</code> 取消此功能，把回车保留在版本库中：
+```
+git config --global core.autocrlf false
+```
+
+[LF](https://en.wikipedia.org/wiki/Newline)
+
+关于 Git 配置的更多介绍请参考 [配置 Git](https://git-scm.com/book/zh/v2/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-%E9%85%8D%E7%BD%AE-Git)。
+
 ## 获取帮助的三种方式
 可以通过以下三种方法可以找到 Git 命令的使用手册：
 ```
@@ -178,6 +205,38 @@ git log --author="author_name"
 ```
 git log --grep="keyword"
 ```
+
+8.查看指定 <code>SHA-1</code> 的提交
+```
+git show commit-hash-id
+```
+该命令会列出此次提交的提交信息以及内容变化，用于快速查看某个历史提交的提交信息以及修改内容。
+
+比如我们先查看 <code>README</code> 文件的提交记录：
+```
+$ git log --oneline README.md
+75b684b Update README.md
+0adb202 Initial commit
+```
+现在我们想知道 <code>75b684b</code> 详细的提交信息以及做了什么修改，就可以使用这个命令：
+```
+$ git show 75b684b
+commit 75b684b16c6fc9378973bc5851db03a440f7c763
+Author: neo1949 <neo1949@qq.com>
+Date:   Mon May 21 16:19:19 2018 +0800
+
+    Update README.md
+
+diff --git a/README.md b/README.md
+index 095d88d..140c9b4 100644
+--- a/README.md
++++ b/README.md
+@@ -1,2 +1,2 @@
+ # GitTest
+-A project used to test git command.
++A project used to learn and record git commands.
+```
+
 
 Git 强大的地方不仅在于提供了丰富的命令，更重要的是可以组合使用这些命令找到我们想要的结果。比如，我想查看作者 neo1949 提交中包含关键字 test 最近的5条记录，可以使用如下的方式：
 ```
@@ -836,6 +895,43 @@ $ git log --oneline --graph -3
 
 关于变基的一些更高级的操作请阅读 [变基](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%8F%98%E5%9F%BA) 中更有趣的例子。必须记住，使用变基必须要准守一条准则：**不要对在你的仓库外有副本的分支执行变基**。如果你遵循这条金科玉律，就不会出差错。否则，人民群众会仇恨你，你的朋友和家人也会嘲笑你，唾弃你。
 
+## 选择修订版本
+### 简短的 <code>SHA-1</code>
+当我们使用 <code>git log</code> 查看提交记录时，提交记录格式是这样的：
+```
+commit 2617b1375f85f0591c459e880497c6f767ddf356
+Merge: 0c61754 05d597e
+Author: neo1949 <neo1949@qq.com>
+Date:   Sun May 27 15:49:32 2018 +0800
+
+    Merge branch 'test'
+```
+
+Git 可以为 <code>2617b1375f85f0591c459e880497c6f767ddf356</code> 这样的 <code>SHA-1</code> 生成出简短且唯一的缩写，通过 <code>git log -\-abbrev-commit</code> 命令可以使输出结果显示简短且唯一的值：
+```
+commit 2617b13
+Merge: 0c61754 05d597e
+Author: neo1949 <neo1949@qq.com>
+Date:   Sun May 27 15:49:32 2018 +0800
+
+    Merge branch 'test'
+```
+
+<code>SHA-1</code> 缩写默认使用七个字符，不过有时为了避免 <code>SHA-1</code> 的歧义，会增加字符数，通常 8 到 10 个字符就已经足够在一个项目中避免 SHA-1 的歧义。
+
+### 引用日志
+工作时 Git 会在后台保存一个引用日志(reflog)，引用日志记录了最近几个月 <code>HEAD</code> 和分支引用所指向的历史。使用 <code>git reflog</code> 来查看引用日志：
+```
+$ git reflog
+13f83a3 HEAD@{0}: reset: moving to 13f83a3
+827ff4b HEAD@{1}: merge rebase_demo: Fast-forward
+6340e0d HEAD@{2}: checkout: moving from rebase_demo to master
+827ff4b HEAD@{3}: rebase finished: returning to refs/heads/rebase_demo
+827ff4b HEAD@{4}: rebase: Add rebase_on_rebase_demo.md file on rebase_demo branch
+......
+```
 
 ## 参考文章
 [Git 官方中文手册](https://git-scm.com/book/zh/v2)
+[Difference between CR LF, LF and CR line break types?
+](https://stackoverflow.com/questions/1552749/difference-between-cr-lf-lf-and-cr-line-break-types)
