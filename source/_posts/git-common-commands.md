@@ -35,6 +35,33 @@ git config --unset user.email
 ```
 再次查看配置信息，可以看到本地配置的用户名和邮箱已经被删除了，提交代码时会默认使用全局配置的用户名和邮箱。
 
+### 格式化与空白字符
+格式化和空白问题是许多开发人员在协作时遇到的一些更令人沮丧和微妙的问题，特别是跨平台问题。因为编辑器的原因，修补程序或其他协作工作很容易引入细微的空白变化，如果你的文件曾经触摸过 Windows 系统，那么它们的行尾可能会被替换掉。Git 提供了几个配置选项来帮助解决这些问题。
+
+#### <code>core.autocrlf</code>
+假如你正在 Windows 上写程序，而你的同伴用的是其他系统（或相反），你可能会遇到 CRLF 问题。 这是因为 Windows 使用回车（CR）和换行（LF）两个字符来结束一行，而 Mac 和 Linux 只使用换行（LF）一个字符。虽然这是小问题，但它会极大地扰乱跨平台协作。许多 Windows 上的编辑器会悄悄把行尾的换行字符转换成回车和换行，或在用户按下 Enter 键时，插入回车和换行两个字符。
+
+Git 可以在提交时自动地把回车和换行转换成换行，而在检出代码时把换行转换成回车和换行。你可以用 <code>core.autocrlf</code> 来打开此项功能。如果是在 Windows 系统上，把它设置成 <code>true</code>，这样在检出代码时，换行会被转换成回车和换行：
+```
+git config --global core.autocrlf true
+```
+
+如果使用以换行作为行结束符的 Linux 或 Mac，你不需要 Git 在检出文件时进行自动的转换；然而当一个以回车加换行作为行结束符的文件不小心被引入时，你肯定想让 Git 修正。 你可以把 <code>core.autocrlf</code> 设置成 <code>input</code> 来告诉 Git 在提交时把回车和换行转换成换行，检出时不转换：
+```
+git config --global core.autocrlf input
+```
+这样在 Windows 上的检出文件中会保留回车和换行，而在 Mac 和 Linux 上，以及版本库中会保留换行。
+
+
+如果你是 Windows 程序员，且正在开发仅运行在 Windows 上的项目，可以设置 <code>false</code> 取消此功能，把回车保留在版本库中：
+```
+git config --global core.autocrlf false
+```
+
+[LF](https://en.wikipedia.org/wiki/Newline)
+
+关于 Git 配置的更多介绍请参考 [配置 Git](https://git-scm.com/book/zh/v2/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-%E9%85%8D%E7%BD%AE-Git)。
+
 ## 获取帮助的三种方式
 可以通过以下三种方法可以找到 Git 命令的使用手册：
 ```
@@ -51,26 +78,30 @@ git help config
 ## Git 的三种状态
 在正式使用 Git 之前，需要了解 Git 中几个非常重要的概念。
 
-首先需要记住 Git 有三种状态，你的文件可能处于其中之一：已提交（committed）、已修改（modified）和已暂存（staged）。已提交表示数据已经安全的保存在本地数据库中。已修改表示修改了文件，但还没保存到数据库中。已暂存表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。
+[Git 基础](https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-Git-%E5%9F%BA%E7%A1%80) 写到 “Git 有三种状态，你的文件可能处于其中之一：已提交 <code>committed</code>、已修改 <code>modified</code> 和已暂存<code>staged</code>”。实际上这段描述翻译地不是特别准确，英文原文是 "Git has three main states that your files can reside in: *committed*, *modified*, and *staged*"。原文实际上说的是 “你的文件在 Git 主要有三种状态：已提交 <code>committed</code>、已修改 <code>modified</code> 和已暂存 <code>staged</code>”，意思是主要有三种状态，而不是只有三种状态的意思。因为这可能给后面 Git 文件状态变化的理解造成误导，所以特地指出。
+
+<code>committed</code> 表示数据已经安全的保存在本地数据库中。<code>modified</code> 表示修改了文件，但还没保存到数据库中。<code>staged</code> 表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。
 
 由此引入 Git 项目的三个工作区域的概念：Git 仓库、工作目录以及暂存区域。
 
 ![工作目录、暂存区域以及 Git 仓库](https://git-scm.com/book/en/v2/images/areas.png)
 
-Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地方。这是 Git 中最重要的部分，从其它计算机克隆仓库时，拷贝的就是这里的数据。
-
-工作目录是对项目的某个版本独立提取出来的内容。这些从 Git 仓库的压缩数据库中提取出来的文件，放在磁盘上供你使用或修改。
-
-暂存区域是一个文件，保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。有时候也被称作‘索引’，不过一般说法还是叫暂存区域。
+- Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地方。这是 Git 中最重要的部分，从其它计算机克隆仓库时，拷贝的就是这里的数据。
+- 工作目录是对项目的某个版本独立提取出来的内容。这些从 Git 仓库的压缩数据库中提取出来的文件，放在磁盘上供你使用或修改。
+- 暂存区域是一个文件，保存了下次将提交的文件列表信息，一般在 Git 仓库目录中。有时候也被称作‘索引’，不过一般说法还是叫暂存区域。
 
 基本的 Git 工作流程如下：
 1. 在工作目录中修改文件。
 2. 暂存文件，将文件的快照放入暂存区域。
 3. 提交更新，找到暂存区域的文件，将快照永久性存储到 Git 仓库目录。
 
-如果 Git 目录中保存着的特定版本文件，就属于已提交状态。 如果作了修改并已放入暂存区域，就属于已暂存状态。 如果自上次取出后，作了修改但还没有放到暂存区域，就是已修改状态。
+如果 Git 目录中保存着特定的版本文件，就属于已提交状态。如果作了修改并已放入暂存区域，就属于已暂存状态。如果自上次取出后，作了修改但还没有放到暂存区域，就是已修改状态。
 
-在使用 Git 命令时，需要牢记 Git 的三种状态以及三个工作区域的概念。
+工作目录下的每一个文件都不外乎两种状态：已跟踪或未跟踪。已跟踪的文件是指那些被纳入了版本控制的文件，在上一次快照中有它们的记录，在工作一段时间后，它们的状态可能处于未修改，已修改或已放入暂存区。工作目录中除已跟踪文件以外的所有其它文件都属于未跟踪文件，它们既不存在于上次快照的记录中，也没有放入暂存区。初次克隆某个仓库的时候，工作目录中的所有文件都属于已跟踪文件，并处于未修改状态。下图是 Git 中文件的状态变化周期：
+
+![文件的状态变化周期](https://git-scm.com/book/en/v2/images/lifecycle.png)
+
+在使用 Git 命令时，需要牢记文件状态以及工作区域的概念。
 
 ## 获取 Git 仓库
 ### 创建一个新的仓库
@@ -82,7 +113,7 @@ git init
 ```
 git clone url [local-repo-name]
 ```
-不指定本地仓库 local-repo-name 名称时，系统会默认创建与远程仓库名称相同的文件夹并将仓库拷贝到文件夹中。
+不指定本地仓库 <code>local-repo-name</code> 名称时，系统会默认创建与远程仓库名称相同的文件夹并将仓库拷贝到文件夹中。
 
 ##  记录每次更新到仓库
 1.查看当前文件的状态
@@ -94,6 +125,7 @@ git status
 ```
 git add filename
 ```
+也可以使用 <code>git commit -A</code> 命令将所有文件添加到暂存区域。
 
 3.查看修改
 ```
@@ -130,7 +162,7 @@ git commit -m "commit message"
 ```
 git log
 ```
-按提交时间列出所有的更新，列出每个提交的 SHA-1 校验和、作者的名字和电子邮件地址、提交时间以及提交说明。
+按提交时间列出所有的更新，列出每个提交的 <code>SHA-1</code> 校验和、作者的名字和电子邮件地址、提交时间以及提交说明。
 
 1.显示指定文件所有的更新
 ```
@@ -147,7 +179,7 @@ git log -n
 git log -p
 ```
 
-以上参数可以混合使用。例如，查看 README 文件最近两次提交的内容差异：
+以上参数可以混合使用。例如，查看 <code>README</code> 文件最近两次提交的内容差异：
 ```
 git log -p -2 README.md
 ```
@@ -173,6 +205,38 @@ git log --author="author_name"
 ```
 git log --grep="keyword"
 ```
+
+8.查看指定 <code>SHA-1</code> 的提交
+```
+git show commit-hash-id
+```
+该命令会列出此次提交的提交信息以及内容变化，用于快速查看某个历史提交的提交信息以及修改内容。
+
+比如我们先查看 <code>README</code> 文件的提交记录：
+```
+$ git log --oneline README.md
+75b684b Update README.md
+0adb202 Initial commit
+```
+现在我们想知道 <code>75b684b</code> 详细的提交信息以及做了什么修改，就可以使用这个命令：
+```
+$ git show 75b684b
+commit 75b684b16c6fc9378973bc5851db03a440f7c763
+Author: neo1949 <neo1949@qq.com>
+Date:   Mon May 21 16:19:19 2018 +0800
+
+    Update README.md
+
+diff --git a/README.md b/README.md
+index 095d88d..140c9b4 100644
+--- a/README.md
++++ b/README.md
+@@ -1,2 +1,2 @@
+ # GitTest
+-A project used to test git command.
++A project used to learn and record git commands.
+```
+
 
 Git 强大的地方不仅在于提供了丰富的命令，更重要的是可以组合使用这些命令找到我们想要的结果。比如，我想查看作者 neo1949 提交中包含关键字 test 最近的5条记录，可以使用如下的方式：
 ```
@@ -247,7 +311,7 @@ $ git push origin master
 git remote show [remote-name]
 ```
 
-例如：查看远程分支 <code>origin</code> 的分支信息
+例如：查看远程仓库 <code>origin</code> 的详细信息
 ```
 $ git remote show origin
 * remote origin
@@ -262,7 +326,9 @@ $ git remote show origin
   Local ref configured for 'git push':
     master pushes to master (up to date)
 ```
-这些信息非常有用，它告诉你正处于 <code>master</code> 分支，并且如果运行 <code>git pull</code>，就会抓取所有的远程引用，然后将远程 <code>master</code> 分支合并到本地 <code>master</code> 分支。它也会列出拉取到的所有远程引用。
+这些信息非常有用，它会列出远程仓库的 URL 与跟踪分支的信息。它会告诉你正处于哪个分支。比如本例中可以看到你当前处于 <code>master</code> 分支，如果你运行 <code>git pull</code> 命令，Git 就会自动抓取所有的远程引用，然后将远程 <code>master</code> 分支合并到本地 <code>master</code> 分支。它也会列出拉取到的所有远程引用。
+
+这个命令还会列出当你在特定的分支上执行 <code>git push</code> 命令式会自动地推送到哪一个远程分支。同时还会列出哪些远程分支不在你的本地，哪些远程分支已经从服务器上移除了，还有当你执行 <code>git pull</code> 时哪些分支会自动合并。
 
 4.<span id="rename_remote_repository">重命名远程仓库</span>
 ```
@@ -383,8 +449,7 @@ c349273 Merge branch 'master' of github.com:neo1949/GitTest
 ```
 可以看到 <code>master</code> 分支指向 <code>aed99ae</code> 开头的提交对象，而 <code>tmp</code> 和 <code>dev</code> 分支则指向 <code>e07e4ca</code> 开头的提交对象。
 
-### 分支管理
-#### 查看分支
+### 查看分支
 1.查看所有本地分支
 ```
 git branch
@@ -416,7 +481,7 @@ git branch --merged
 git branch --no-merged
 ```
 
-#### 切换分支
+### 切换分支
 1.切换到指定分支：
 ```
 git checkout branch-name
@@ -453,8 +518,8 @@ $ git log --decorate --oneline --graph --all
 * 0adb202 Initial commit
 ```
 
-#### 合并分支
-分支的合并请仔细阅读 [分支的创建与合并](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6) 章节中“分支的合并”的部分，主要记住合并分支的命令是 <code>git merge branch-name</code>。关于如何解决合并时的冲突，文档里面提供详细了的介绍，请仔细阅读。
+### <span id="merge_branches">合并分支</span>
+分支的合并请仔细阅读 [分支的创建与合并](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6) 章节中“分支的合并”部分，主要记住合并分支的命令是 <code>git merge branch-name</code>。关于如何解决合并时的冲突，文档里面提供详细了的介绍，请仔细阅读。
 
 下面我们将在本地模拟合并分支冲突的情形：
 
@@ -479,7 +544,7 @@ $ git add merge_conflict_test.md
 $ git commit -m "Add a line in merge_conflict_test.md on merge_demo branch"
 $ git checkout master
 ```
-此时查看 "merge_conflict_test.md" 文件，可以看到我们刚才添加的那行内容不见了。这是必然的，因为我们的修改是在 <code>merge_demo</code> 分支上进行的。
+切回到主分支后查看 "merge_conflict_test.md" 文件，可以看到我们刚才添加的那行内容不见了。这是必然的，因为我们的修改是在 <code>merge_demo</code> 分支上进行的。
 
 5.接下来再次在 "merge_conflict_test.md" 文件的第一行添加一句话：
 > This line was added on master branch.
@@ -546,7 +611,7 @@ Merge branch 'merge_demo'
 
 现在我们应该已经学会如何解决合并冲突的问题了！
 
-#### 删除分支
+### 删除分支
 1.<span id="delete_local_branch">删除本地分支</span>
 ```
 git branch -d branch-name
@@ -606,7 +671,7 @@ $ git branch -a
   remotes/origin/tmp
 ```
 
-#### 远程分支
+### 远程分支
 远程分支的概念请先阅读 [远程分支](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF)。以下为个人摘录总结，可能存在理解错误。
 
 远程引用是对远程仓库的引用（指针），包括分支、标签等等。可以通过 <code>git ls-remote (remote)</code> 来显式地获得远程引用的完整列表，或者通过之前介绍过的  <code>git remote show (remote)</code> 命令获得远程分支的更多信息。通常更常见的做法是利用**远程跟踪分支**。
@@ -650,7 +715,7 @@ git clone [-o shortname] url [local-repo-name]
 - shortname ：使用 <code>shortname</code> 作为远程仓库名，不指定该参数时使用 <code>origin</code> 作为远程仓库名
 - local-repo-name ：使用 <code>local-repo-name</code> 作为工作目录名称，不指定该参数时使用远程仓库名创建工作目录
 
-##### 将本地分支推送远程仓库
+#### 将本地分支推送远程仓库
 ```
 git push remote-name branch-name[:remote-branch-name]
 ```
@@ -692,7 +757,7 @@ remotes/origin/tmp
 ```
 可以看到远程仓库多了一个 <code>remote-cache</code> 分支。
 
-##### 删除远程分支
+#### 删除远程分支
 [删除远程分支](#delete_remote_branch) 和 [删除本地分支](#delete_local_branch) 的命令在前面已经介绍过了，现在我们来删除刚才用于演示的 <code>local-dev</code> 和 <code>local-cache</code> 本地分支，以及它们对应的远程仓库中的分支：
 ```
 $ git branch -d local-dev
@@ -710,12 +775,12 @@ $ git branch -a
 ```
 可以看到远程库中的 <code>local-dev</code> 和 <code>remote-cache</code> 分支都被删除掉了。
 
-##### 跟踪分支
+#### 跟踪分支
 从一个远程跟踪分支检出一个本地分支会自动创建一个叫做 “跟踪分支”（有时候也叫做 “上游分支”）。跟踪分支是与远程分支有直接关系的本地分支。如果在一个跟踪分支上输入 <code>git pull</code>，Git 能自动地识别去哪个服务器上抓取、合并到哪个分支。
 
-前面我们已经知道，当克隆一个仓库时，它会自动地创建一个跟踪 <code>origin/master</code> 的 <code>master</code> 分支。然而，如果你愿意的话可以设置其他的跟踪分支 - 其他远程仓库上的跟踪分支，或者不跟踪 <code>master</code> 分支。
+前面我们已经知道，当克隆一个仓库时，它会自动地创建一个跟踪 <code>origin/master</code> 的 <code>master</code> 分支。然而，如果你愿意的话可以设置其他的跟踪分支 - 跟踪其他远程仓库上的分支或者不跟踪 <code>master</code> 分支。
 
-假设有个小组的管理人员在本地创建了 <code>team</code> 分支并将其推送了远仓库，现在指定小组内的所有人都要在这个 <code>team</code> 分支上进行工作。当管理人员将 <code>team</code> 分支推送到远程仓库后，其他人通过 <code>git fetch</code> 从服务器上抓取数据时，他们会在本地生成一个 <code>origin/team</code> 远程分支，指向服务器中 <code>team</code> 分支的引用。
+假设有个小组的管理人员在本地创建了 <code>team</code> 分支并将其推送了远程仓库，现在指定小组内的所有人都要在这个 <code>team</code> 分支上进行工作。当管理人员将 <code>team</code> 分支推送到远程仓库后，其他人通过 <code>git fetch</code> 从服务器上抓取数据时，他们会在本地生成一个 <code>origin/team</code> 远程分支，指向服务器中 <code>team</code> 分支的引用。
 
 需要特别注意是当抓取到新的远程跟踪分支时，本地并不会自动生成一份可编辑的副本（拷贝）。换句话说，系统不会在本地创建一个 <code>team</code> 分支，只有一个不可修改的 <code>origin/team</code> 指针。那么我们如何创建一个跟踪 <code>team</code> 分支的本地分支呢？有三种实现方式：
 
@@ -732,7 +797,7 @@ $ git checkout -b team origin/team
 Branch team set up to track remote branch team from origin.
 Switched to a new branch 'team'
 ```
-当然了，我们可以将本地分支与远程分支设置为不同的名字，只需要将 <code>team</code> 换成我们需要的名字即可，比如运行 <code>git checkout -b my-team origin/team</code>，现在 <code>my-team</code> 被设置为用来跟踪远程仓库中的 <code>team</code>，本地分支 <code>my-team</code> 会自动从 <code>origin/team</code> 拉取数据。
+当然了，我们可以将本地分支与远程分支设置为不同的名字，只需要将 <code>team</code> 换成我们需要的名字即可。比如运行 <code>git checkout -b my-team origin/team</code>，现在 <code>my-team</code> 被设置为用来跟踪远程仓库中的 <code>team</code>，本地分支 <code>my-team</code> 会自动从 <code>origin/team</code> 拉取数据。
 
 3.第三种
 ```
@@ -741,7 +806,7 @@ Switched to a new branch 'team'
 $ git branch -u origin/team
 Branch team set up to track remote branch team from origin.
 ```
-我们可以先创建一个本地分支，然后切换到该分支后执行 <code>git branch -u remote-name/branch-name</code> 或者 <code>git branch -\-set-upstream-to remote-name/branch-name</code> 命令来显示地设置让当前本地分支追踪某个上游分支。通过这个命令我们还可以修改正在跟踪的上游分支。比如我们刚才让本地的 <code>team</code> 追踪上游的 <code>team</code>，现在我们在 <code>team</code> 分支上的所有工作都完成了并且合并到了主分支 <code>master</code> 上面，后续的工作基于 <code>master</code> 分支继续进行就可以了，那么我们现在就可以使用 <code>git branch -u origin/master</code> 让 <code>team</code> 追踪主分支 <code>master</code>，这样我们就可以在 <code>team</code> 分支上继续工作了。
+我们可以先创建一个本地分支，然后切换到该分支后执行 <code>git branch -u remote-name/branch-name</code> 或者 <code>git branch -\-set-upstream-to=remote-name/branch-name</code> 命令来显示地设置让当前本地分支追踪某个上游分支。通过这个命令我们还可以修改正在跟踪的上游分支。比如我们刚才让本地的 <code>team</code> 追踪上游的 <code>team</code>，现在我们在 <code>team</code> 分支上的所有工作都完成了并且合并到了主分支 <code>master</code> 上面，后续的工作基于 <code>master</code> 分支继续进行就可以了，那么我们现在就可以使用 <code>git branch -u origin/master</code> 让 <code>team</code> 追踪主分支 <code>master</code>，这样我们就可以在 <code>team</code> 分支上继续工作了。
 
 想要查看设置的所有跟踪分支，可以使用<code>git branch -vv</code> 命令。这会将所有的本地分支列出来并且包含更多的信息，如每一个分支正在跟踪哪个远程分支，本地分支是否是领先、落后或是都有。
 
@@ -756,10 +821,117 @@ $ git branch -vv
 
 需要注意的是这些数字的值只是来自于你从每个服务器上最后一次抓取的数据。这个命令并没有连接服务器，它只会告诉你关于本地缓存的服务器数据。如果想要统计最新的领先与落后数字，需要先运行 <code>git fetch -\-all</code> 命令后再运行查看跟踪分支的命令。
 
-##### 拉取数据
+#### 拉取数据
 使用 <code>git fetch</code> 命令从服务器上抓取本地没有的数据时，它并不会修改工作目录中的内容，它只会获取数据然后让你自己合并。然而，有一个命令叫作 <code>git pull</code>， 在大多数情况下它的含义是一个 <code>git fetch</code> 紧接着一个 <code>git merge</code> 命令。如果你像之前章节中演示的那样设置好了一个跟踪分支，不管它是显式地设置还是通过 <code>clone</code> 或 <code>checkout</code> 命令创建的，<code>git pull</code> 都会查找当前分支所跟踪的服务器与分支，从服务器上抓取数据然后尝试合并入那个远程分支。
 
 由于 <code>git pull</code> 的魔法经常令人困惑，所以通常单独显式地使用 <code>fetch</code> 与 <code>merge</code> 命令会更好一些。
 
+### 变基
+在 Git 中整合来自不同分支的修改主要有两种方法：<code>merge</code> 以及 <code>rebase</code>。关于 <code>merge</code> 以及 <code>rebase</code> 命令的原理请参考文档 [变基](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%8F%98%E5%9F%BA)。我们已经在前面 [合并分支](#merge_branches) 章节介绍过了如何使用 <code>merge</code> 命令，现在开始介绍如何使用 <code>rebase</code> 命令。还是以实例操作来演示，这样方便直观，便于理解和学习。
+
+1.首先切换到 <code>master</code> 分支，在 <code>log.md</code> 文件上添加一行说明性文字，然后将修改提交到仓库中：
+```
+$ git checkout master
+$ git add log.md
+$ git commit -m "Generate a commit log in repository for 'git rebase' test"
+$ git push origin master
+$ git log --oneline -2
+13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+2617b13 Merge branch 'test'
+```
+稍后我们将以 <code>13f83a3</code> 为节点来演示 <code>rebase</code> 操作。
+
+2.新建一个 <code>rebase_demo</code> 分支，切换到该分支后按照如下步骤操作：
+```
+$ git checkout -b rebase_demo
+$ touch rebase_on_rebase_demo.md
+$ git add rebase_on_rebase_demo.md
+$ git commit -m "Add rebase_on_rebase_demo.md file on rebase_demo branch"
+$ git log --oneline -2
+176ec79 Add rebase_on_rebase_demo.md file on rebase_demo branch
+13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+```
+现在我们在 <code>rebase_demo</code> 分支上有了一个 <code>176ec79</code> 提交。
+
+3.切回 <code>master</code> 分支，按如下步骤操作：
+```
+$ git checkout master
+$ touch rebase_on_master.md
+$ git add rebase_on_master.md
+$ git commit -m "Add rebase_on_master.md file in master branch"
+$ git log --oneline -2
+6340e0d Add rebase_on_master.md file in master branch
+13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+```
+现在我们在 <code>master</code> 分支上有了一个 <code>6340e0d</code> 提交。
+
+我们知道 <code>176ec79</code> 和 <code>6340e0d</code> 的共同祖先是 <code>13f83a3</code>。
+
+使用 <code>merge</code> 命令将 <code>rebase_demo</code> 分支上的修改合并到 <code>master</code> 分支时，Git 会对 <code>176ec79</code> 、<code>6340e0d</code> 以及  <code>13f83a3</code> 进行三方合并，生成一个新的快照（并提交）。除了通过合并整合分叉的历史，还有一种方法就是使用 <code>rebase</code> 命令。方法如下：首先提取在 <code>176ec79</code> 中引入的补丁和修改，然后在 <code>6340e0d</code> 的基础上应用一次。 在 Git 中，这种操作就叫做 **变基**。你可以使用 <code>rebase</code> 命令将提交到某一分支上的所有修改都移至另一分支上，就好像“重新播放”一样。命令操作如下：
+```
+$ git checkout rebase_demo
+$ git rebase master
+First, rewinding head to replay your work on top of it...
+Applying: Add rebase_on_rebase_demo.md file on rebase_demo branch
+```
+
+它的原理是首先找到这两个分支（即当前分支 <code>rebase_demo</code>、变基操作的目标基底分支 <code>master</code>）的最近共同祖先 <code>13f83a3</code>，然后对比当前分支相对于该祖先的历次提交，提取相应的修改并存为临时文件，然后将当前分支指向目标基底 <code>6340e0d</code>，最后以此将之前另存为临时文件的修改依序应用。
+
+现在回到 <code>master</code> 分支进行一次快进合并：
+```
+$ git checkout master
+$ git merge rebase_demo
+$ git log --oneline --graph -3
+* 827ff4b Add rebase_on_rebase_demo.md file on rebase_demo branch
+* 6340e0d Add rebase_on_master.md file in master branch
+* 13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+```
+
+此时，<code>827ff4b</code> 指向的快照就和使用 <code>merge</code> 命令最终生成的快照一模一样了。***这两种整合方法的最终结果没有任何区别，但是变基使得提交历史更加整洁。***上面我们用命令查看经过变基的分支的历史记录时会发现，尽管实际的开发工作是并行的，但它们看上去就像是串行的一样，提交历史是一条直线没有分叉。
+
+一般我们这样做的目的是为了确保在向远程分支推送时能保持提交历史的整洁——例如向某个其他人维护的项目贡献代码时。在这种情况下，你首先在自己的分支里进行开发，当开发完成时你需要先将你的代码变基到 <code>origin/master</code> 上，然后再向主项目提交修改。这样的话，该项目的维护者就不再需要进行整合工作，只需要快进合并便可。
+
+请注意，无论是通过变基，还是通过三方合并，整合的最终结果所指向的快照始终是一样的，只不过提交历史不同罢了。变基是将一系列提交按照原有次序依次应用到另一分支上，而合并是把最终结果合在一起。
+
+关于变基的一些更高级的操作请阅读 [变基](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%8F%98%E5%9F%BA) 中更有趣的例子。必须记住，使用变基必须要准守一条准则：**不要对在你的仓库外有副本的分支执行变基**。如果你遵循这条金科玉律，就不会出差错。否则，人民群众会仇恨你，你的朋友和家人也会嘲笑你，唾弃你。
+
+## 选择修订版本
+### 简短的 <code>SHA-1</code>
+当我们使用 <code>git log</code> 查看提交记录时，提交记录格式是这样的：
+```
+commit 2617b1375f85f0591c459e880497c6f767ddf356
+Merge: 0c61754 05d597e
+Author: neo1949 <neo1949@qq.com>
+Date:   Sun May 27 15:49:32 2018 +0800
+
+    Merge branch 'test'
+```
+
+Git 可以为 <code>2617b1375f85f0591c459e880497c6f767ddf356</code> 这样的 <code>SHA-1</code> 生成出简短且唯一的缩写，通过 <code>git log -\-abbrev-commit</code> 命令可以使输出结果显示简短且唯一的值：
+```
+commit 2617b13
+Merge: 0c61754 05d597e
+Author: neo1949 <neo1949@qq.com>
+Date:   Sun May 27 15:49:32 2018 +0800
+
+    Merge branch 'test'
+```
+
+<code>SHA-1</code> 缩写默认使用七个字符，不过有时为了避免 <code>SHA-1</code> 的歧义，会增加字符数，通常 8 到 10 个字符就已经足够在一个项目中避免 SHA-1 的歧义。
+
+### 引用日志
+工作时 Git 会在后台保存一个引用日志(reflog)，引用日志记录了最近几个月 <code>HEAD</code> 和分支引用所指向的历史。使用 <code>git reflog</code> 来查看引用日志：
+```
+$ git reflog
+13f83a3 HEAD@{0}: reset: moving to 13f83a3
+827ff4b HEAD@{1}: merge rebase_demo: Fast-forward
+6340e0d HEAD@{2}: checkout: moving from rebase_demo to master
+827ff4b HEAD@{3}: rebase finished: returning to refs/heads/rebase_demo
+827ff4b HEAD@{4}: rebase: Add rebase_on_rebase_demo.md file on rebase_demo branch
+......
+```
+
 ## 参考文章
 [Git 官方中文手册](https://git-scm.com/book/zh/v2)
+[Difference between CR LF, LF and CR line break types?
+](https://stackoverflow.com/questions/1552749/difference-between-cr-lf-lf-and-cr-line-break-types)
