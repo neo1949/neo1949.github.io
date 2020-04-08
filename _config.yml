@@ -79,5 +79,5 @@ theme: icarus
 deploy:
   type: git
   repo: git@github.com:neo1949/neo1949.github.io.git
-  branch: deploy
+  branch: gh-pages
   message: Site updated on {{ now('YYYY/MM/DD HH:mm') }}
