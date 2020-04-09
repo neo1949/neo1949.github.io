@@ -1,6 +1,9 @@
+# Show toc on post page
 widgets:
-    # Toc configurations
     -
-        # Where should the widget be placed, left sidebar or right sidebar
         position: right
         type: toc
+# Make toc sticky when scrolling the page
+sidebar:
+    right:
+        sticky: true
