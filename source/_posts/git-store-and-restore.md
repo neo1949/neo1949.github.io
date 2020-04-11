@@ -7,6 +7,8 @@ categories:
 
 ---
 
+本文概述
+<!-- more -->
 
 ## <div id="_git_checkout">git checkout</div>
 TODO
