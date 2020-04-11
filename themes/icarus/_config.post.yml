@@ -7,3 +7,15 @@ widgets:
 sidebar:
     right:
         sticky: true
+# No comment function for now
+comment:
+# Donate plugin configurations
+donates:
+    -
+        type: alipay
+        qrcode: ''
+    -
+        type: wechat
+        url: ''
+# No share function
+share:
