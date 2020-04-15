@@ -1,5 +1,5 @@
 ---
-title: Git 存储与恢复
+title: Git 存储、撤消、恢复
 toc: true
 tags:
     - git
@@ -7,15 +7,116 @@ categories:
 
 ---
 
-本文概述
+![文件的状态变化周期](https://git-scm.com/book/en/v2/images/lifecycle.png)
+
 <!-- more -->
 
+理解 `reset` 和 `checkout` 命令请参考 [Git 工具 - 重置揭密](https://git-scm.com/book/zh/v2/Git-%E5%B7%A5%E5%85%B7-%E9%87%8D%E7%BD%AE%E6%8F%AD%E5%AF%86)。
+
+
+## <div id="_git_add">git add</div>
+`git add <file>` 命令很简单，就是将文件添加到暂存区。
+
+`<file>` 支持通配符，比如 `git add *.txt` 将所有格式为 txt 的文件添加到暂存区。
+
+可以使用 `git add -A` 或 `git add .` 添加所有本地修改的文件（包括未跟踪的文件）。
+
+
 ## <div id="_git_checkout">git checkout</div>
-TODO
+`git checkout` 命令用于撤消对文件的修改，<font color="red"><b>该命令会删除文件在本地的任何修改，请谨慎使用该命令。</b></font>
+
+```shell
+$ git log --pretty=oneline
+f48884c1ae2b1427e3d33d22345d66f30fe5f23c Add README file
+dcf611e337c97ea23b230e841516cae7935fd1e4 add v3 file.txt
+a0b947eb9049ad83e3f85a383e5223783fc43065 add v2 file.txt
+c8232794435b45058018355dad81e3a289ed0192 add v1 file.txt
+
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   README.md
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   file.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	test.txt
+
+$ git checkout .
+
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   README.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	test.txt
+```
+
+如上所示，`checkout` 命令只作用于已跟踪但尚未提交到暂存区的文件，未跟踪文件以及已暂存文件不会受到影响。
 
 
 ## <div id="_git_reset">git reset</div>
-TODO
+
+### <div id="_git_reset_to_unstage_file">取消暂存的文件</div>
+本地修改了的多个文件需要作为两次独立的修改提交，习惯性使用 `git add .` 暂存了所有的修改，可以使用 `git reset <file>` 命令将文件移出暂存区：
+```shell
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   README.md
+	modified:   file.txt
+
+$ git reset README.md
+Unstaged changes after reset:
+M	README.md
+
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   file.txt
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   README.md
+```
+
+`git reset <file>` 不会删除文件在本地的修改，可以放心使用。
+
+```shell
+$ git log --abbrev-commit --pretty=oneline
+dcf611e add v3 file.txt
+a0b947e add v2 file.txt
+c823279 add v1 file.txt
+
+$ git reset dcf611e
+
+$ git status
+On branch master
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	README.md
+
+```
 
 
 ## <div id="_git_stash_command">git stash</div>
