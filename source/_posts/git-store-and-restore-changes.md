@@ -375,8 +375,10 @@ $ git stash list
 
 ## <div id="_resotre_changes">恢复修改</div>
 
-### <div id="_restore_committed_changes">恢复已提交的修改</div>
-本地已经 `commit` 过修改，但还没有将修改 `push` 到服务器，这时候使用 `git reset --hard <commit-id>` 将本地代码恢复到了某个提交点处：
+### <div id="_restore_committed_changes">恢复本地已提交的修改</div>
+本地修改已经 `commit`，然后某个时刻在分支中使用了 `git reset --hard <commit>` 命令重置了索引和目录树，`reset` 后发现修改还没有 `push` 到服务器，可以使用以下方式恢复修改。
+
+示例：本地提交后重置了当前分支的 `HEAD`
 ```shell
 $ git log --abbrev-commit --pretty=oneline -3
 13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
@@ -407,12 +409,12 @@ $ git log --abbrev-commit --pretty=oneline -3
 b1de099 Merge branch 'dev'
 ```
 
-如上所示，新创建的文件 git.md 不见了，这时候可以使用 `git reflog` 命令查看提交记录：
+现在需要将 `ef88a9c` 对应的提交推送到服务器 ，那么首先需要恢复该修改，有如下方式。
+
+#### <div id="_use_sha1_to_restore_uncommitted_changes">利用 SHA-1 校验和恢复修改</div>
 ```shell
-$ git reflog
-2617b13 HEAD@{0}: reset: moving to 2617b13
-ef88a9c HEAD@{1}: commit: Add git command summary
-13f83a3 HEAD@{2}: clone: from https://github.com/neo1949/GitTest.git
+$ git reset --hard ef88a9c
+HEAD is now at ed74a3e Add git command summary
 
 $ git checkout ef88a9c
 Note: checking out 'ef88a9c'.
@@ -429,12 +431,27 @@ do so (now or later) by using -b with the checkout command again. Example:
 HEAD is now at ef88a9c... Add git command summary
 ```
 
+#### <div id="_use_reflog_to_restore_uncommitted_changes">利用 `reflog` 命令恢复修改</div>
 ```shell
 $ git reflog
 2617b13 HEAD@{0}: reset: moving to 2617b13
-ed74a3e HEAD@{1}: commit: Add git command summary
+ef88a9c HEAD@{1}: commit: Add git command summary
 13f83a3 HEAD@{2}: clone: from https://github.com/neo1949/GitTest.git
 
 $ git reset --hard HEAD@{1}
 HEAD is now at ed74a3e Add git command summary
+
+$ git checkout HEAD@{1}
+Note: checking out 'HEAD@{1}'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b <new-branch-name>
+
+HEAD is now at ef88a9c... Add git command summary
 ```
