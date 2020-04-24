@@ -1,5 +1,5 @@
 ---
-title: Git 存储、撤消、恢复
+title: Git 修改的存储、撤销与恢复
 toc: true
 tags:
     - git
@@ -371,3 +371,70 @@ $ git stash list
 ```
 
 **注意：** 删除状态时，修改的内容也会被删除。
+
+
+## <div id="_resotre_changes">恢复修改</div>
+
+### <div id="_restore_committed_changes">恢复已提交的修改</div>
+本地已经 `commit` 过修改，但还没有将修改 `push` 到服务器，这时候使用 `git reset --hard <commit-id>` 将本地代码恢复到了某个提交点处：
+```shell
+$ git log --abbrev-commit --pretty=oneline -3
+13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+2617b13 Merge branch 'test'
+0c61754 Merge branch 'tmp'
+
+$ vim git.md
+
+$ git add git.md
+
+$ git commit -m "Add git command summary"
+[master ef88a9c] Add git command summary
+ 1 file changed, 1 insertion(+)
+ create mode 100644 git.md
+
+$ git log --abbrev-commit --pretty=oneline -3
+ef88a9c Add git command summary
+13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+2617b13 Merge branch 'test'
+
+// commit 之后未 push 到服务器执行了 reset 命令
+$ git reset --hard 2617b13
+HEAD is now at 2617b13 Merge branch 'test'
+
+$ git log --abbrev-commit --pretty=oneline -3
+2617b13 Merge branch 'test'
+0c61754 Merge branch 'tmp'
+b1de099 Merge branch 'dev'
+```
+
+如上所示，新创建的文件 git.md 不见了，这时候可以使用 `git reflog` 命令查看提交记录：
+```shell
+$ git reflog
+2617b13 HEAD@{0}: reset: moving to 2617b13
+ef88a9c HEAD@{1}: commit: Add git command summary
+13f83a3 HEAD@{2}: clone: from https://github.com/neo1949/GitTest.git
+
+$ git checkout ef88a9c
+Note: checking out 'ef88a9c'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b <new-branch-name>
+
+HEAD is now at ef88a9c... Add git command summary
+```
+
+```shell
+$ git reflog
+2617b13 HEAD@{0}: reset: moving to 2617b13
+ed74a3e HEAD@{1}: commit: Add git command summary
+13f83a3 HEAD@{2}: clone: from https://github.com/neo1949/GitTest.git
+
+$ git reset --hard HEAD@{1}
+HEAD is now at ed74a3e Add git command summary
+```
