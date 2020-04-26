@@ -71,7 +71,7 @@ Untracked files:
 ## <div id="_git_reset">git reset</div>
 
 ### <div id="_git_reset_to_unstage_file">取消暂存的文件</div>
-本地修改了的多个文件需要作为两次独立的修改提交，习惯性使用 `git add .` 暂存了所有的修改，可以使用 `git reset <file>` 命令将文件移出暂存区：
+使用 `git add .` 命令将本地修改全部添加到了暂存区 ，提交时发现某些文件不在本次提交范围内，可以使用 `git reset <pathspec>...` 命令将文件移出暂存区：
 ```shell
 $ git status
 On branch master
@@ -99,23 +99,13 @@ Changes not staged for commit:
 	modified:   README.md
 ```
 
-`git reset <file>` 不会删除文件在本地的修改，可以放心使用。
-
+`reset` 命令后面参数为路径名时，不用担心误使用 `--hard` 模式选项会导致本地修改丢失。如果参数为路径名，同时指定模式名称，系统会提示错误：
 ```shell
-$ git log --abbrev-commit --pretty=oneline
-dcf611e add v3 file.txt
-a0b947e add v2 file.txt
-c823279 add v1 file.txt
+$ git reset --hard test.md
+fatal: Cannot do hard reset with paths.
 
-$ git reset dcf611e
-
-$ git status
-On branch master
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-
-	README.md
-
+$ git reset --soft test.md
+fatal: Cannot do soft reset with paths.
 ```
 
 
@@ -455,3 +445,50 @@ do so (now or later) by using -b with the checkout command again. Example:
 
 HEAD is now at ef88a9c... Add git command summary
 ```
+
+### <div id="_changes_unable_to_restore"><font color="red">无法恢复修改的情形</font></div>
+如果使用 `git checkout <pathspec>` 命令撤销了未提交到暂存区的本地修改，`git` 没有可用命令恢复修改。这种时候可以使用软件的 `Ctrl + Z` 回退功能：立即找到被撤销修改的文件执行回退操作，如果软件的回退功能也无法找回修改，那么只能 “恭喜” 你了！
+
+使用 `git reset --hard <commit>` 重置分支 `HEAD` 时，如果本地修改尚未提交，那么本地已跟踪文件的修改同样会丢失，并且无法恢复：
+```shell
+$ git st
+On branch master
+Your branch is up-to-date with 'origin/master'.
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   test.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	Test.java
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+$ git log --abbrev-commit --pretty=oneline -3
+13f83a3 Summary: Generate a commit log in repository for 'git rebase' test
+2617b13 Merge branch 'test'
+0c61754 Merge branch 'tmp'
+
+$ git reset --hard 0c61754
+HEAD is now at 0c61754 Merge branch 'tmp'
+
+$ git status
+On branch master
+Your branch is behind 'origin/master' by 3 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	Test.java
+
+nothing added to commit but untracked files present (use "git add" to track)
+```
+
+如果文件处于 `Untracked` 状态，那么文件不会丢失，这可能是使用 `reset` 命令导致修改丢失唯一不那么难受的事情了。
+
+<font color="red">因此，谨慎以下两种情形，因为本地修改可能无法恢复：</font>
+1. 使用 `git checkout <pathspec>` 撤销本地已跟踪文件的修改
+2. 本地修改未提交时使用 `git reset --hard <commit>` 命令
